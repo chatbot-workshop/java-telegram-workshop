@@ -1,0 +1,129 @@
+= Chatbot Workshop
+
+Copyright (c) 2018 https://www.fihlon.ch/[Marcus Fihlon]
+
+== Prerequesites
+
+- Java 8
+- Java IDE
+- You should be familiar with your IDE
+- You need your own Telegram account
+- You need Telegram installed on your mobile or desktop
+
+== Register
+
+Use Telegram to talk to the `BotFather` to register a new bot. Write down your bot username and your bot token.
+
+== Project setup
+
+For this workshop we use gradle. Please create a new gradle project using your IDE.
+
+== Getting started
+
+=== Dependencies
+
+To use the Telegram Bot API, please add the following dependency:
+
+```groovy
+compile group: 'org.telegram', name: 'telegrambots', version: '3.6'
+```
+
+=== Create a bot class
+
+Create a class `GettingStartedBot` that extends `TelegramLongPollingBot` and add empty methods to satisfy the class contract:
+
+```java
+public class GettingStartedBot extends TelegramLongPollingBot {
+
+  @Override
+  public String getBotUsername() {
+    return null;
+  }
+
+  @Override
+  public String getBotToken() {
+    return null;
+  }
+
+  @Override
+  public void onUpdateReceived(final Update update) {
+  }
+
+}
+```
+
+=== Bot username
+
+The first method must return the username of your bot you wrote down while you registered your bot:
+
+```java
+@Override
+public String getBotUsername() {
+  return "MyWorkshopBot";
+}
+```
+
+=== Bot token
+
+As you might imagine, the second method has to return the token of your bot. The token is needed for identification, like a password, so keep it private and *do not* commit it to any registry:
+
+```java
+@Override
+public String getBotToken() {
+  return "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+}
+```
+
+=== React on a message
+
+In the third method you write your code which will be executed when your bot receives a message. For uour first example we will just send the same message back to the sender:
+
+```java
+@Override
+public void onUpdateReceived(final Update update) {
+  if (update.hasMessage() && update.getMessage().hasText()) {
+    final Long chatId = update.getMessage().getChatId();
+    final String text = update.getMessage().getText();
+    final SendMessage message = new SendMessage()
+        .setChatId(chatId)
+        .setText(text);
+    try {
+      execute(message);
+    } catch (final TelegramApiException e) {
+      e.printStackTrace();
+    }
+  }
+}
+```
+
+This example should be quite easy to understand. First, we check if we have a message and it is a text message. Then we extract two values:
+
+. The `chatId`, which identifies a chat. We need this id, to send the answer to the correct person. Every chat has a unique id. We could save this id for later use and reply at any time. But here, we reply immediately.
+. The text. This is just the text of the message, the bot received.
+
+To send an answer, we have to create a `SendMessage` method and set the `chatId` and the text, which should be send. Then we `excute` this method, which will send the message. Of course, there can happen a lot of errors (servers down, network failures etc), so have to do really good error handling like in the example above.
+
+=== Start your bot
+
+For our simple example, we just a good old `main` method. The start needs four steps:
+
+. We need a Telegram API context
+. We need an instance of the Telegram API
+. We need an instance of our bot
+. We need to register our bot instance at Telegram
+
+```java
+public static void main(final String[] args) throws TelegramApiRequestException {
+  ApiContextInitializer.init();                          // 1
+  final TelegramBotsApi api = new TelegramBotsApi();     // 2
+  final GettingStartedBot bot = new GettingStartedBot(); // 3
+  api.registerBot(bot);                                  // 4
+}
+```
+
+=== Play with your bot
+
+Now, start your bot by running your `main` method.
+
+_Congratulations!_
+
