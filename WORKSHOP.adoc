@@ -127,3 +127,82 @@ Now, start your bot by running your `main` method.
 
 _Congratulations!_
 
+== Thinking in Abilities
+
+// TODO describe the ability feature of the Telegram Bot API
+
+=== Dependencies
+
+To use the Telegram Bot Ability API, please add the following dependency:
+
+```groovy
+compile group: 'org.telegram', name: 'telegrambots-abilities', version: '3.6'
+```
+
+=== Create a bot class
+
+Create a class `WorkshopBot` that extends `AbilityBot` and add a no argument constructor and empty methods to satisfy the class contract:
+
+```java
+public class WorkshopBot extends AbilityBot {
+
+  public WorkshopBot() {
+    super(null, null);
+  }
+
+  @Override
+  public int creatorId() {
+    return 0;
+  }
+}
+```
+
+=== Bot token and username
+
+The easy part: Add the token and username of your bot as constants to your class and specify them in the super constructor call:
+
+```java
+public class WorkshopBot extends AbilityBot {
+
+  private static String BOT_TOKEN = "381467743:AAGJAtBZpqcqFHRFcSfzd3LZZTlYKf674ow";
+  private static String BOT_USERNAME = "McPringleBot";
+
+  public WorkshopBot() {
+    super(BOT_TOKEN, BOT_USERNAME);
+  }
+
+  …
+}
+```
+
+=== Your Telegram ID
+
+AbilityBot forces a single implementation of creator ID. This ID corresponds to you, the bot developer. The bot needs to know its master since it has sensitive commands that only the master can use. So, if your Telegram ID Is 123456789, then add the following method:
+
+```java
+@Override
+public int creatorId() {
+  return 123456789;
+}
+```
+
+If you do not know your Telegram ID, just start a chat to the `userinfobot`.
+
+=== Start your bot
+
+To start the ability bot we need to do exactly the same as with the bot, we created before:
+
+. We need a Telegram API context
+. We need an instance of the Telegram API
+. We need an instance of our bot
+. We need to register our bot instance at Telegram
+
+```java
+public static void main(final String[] args) throws TelegramApiRequestException {
+  ApiContextInitializer.init();                      // 1
+  final TelegramBotsApi api = new TelegramBotsApi(); // 2
+  final WorkshopBot bot = new WorkshopBot();         // 3
+  api.registerBot(bot);                              // 4
+}
+```
+
