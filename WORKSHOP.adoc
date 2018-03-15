@@ -188,6 +188,29 @@ public int creatorId() {
 
 If you do not know your Telegram ID, just start a chat to the `userinfobot`.
 
+=== Say hello
+
+Should be easy: Let's say hello. For creating an ability, we use the builder pattern:
+
+```java
+public Ability sayHelloWorld() {
+  return Ability
+      .builder()
+      .name("hello")                                                    // 1
+      .info("says hello world")                                         // 2
+      .locality(ALL)                                                    // 3
+      .privacy(PUBLIC)                                                  // 4
+      .action(context -> silent.send("Hello world!", context.chatId())) // 5
+      .build();
+}
+```
+
+. the name of the command
+. a description of the command
+. the location of the command (`ALL`, `USER`, `GROUP`)
+. the privacy setting (`PUBLIC`, `GROUP_ADMIN`, `ADMIN`, `CREATOR`)
+. the action to be executed
+
 === Start your bot
 
 To start the ability bot we need to do exactly the same as with the bot, we created before:
@@ -205,4 +228,22 @@ public static void main(final String[] args) throws TelegramApiRequestException 
   api.registerBot(bot);                              // 4
 }
 ```
+
+=== Play with your bot
+
+Now, start your bot by running your `main` method and send the `/hello` command to your bot.
+
+_Congratulations!_
+
+Wait! Since you've implemented an ability bot, you get factory abilities as well. Try:
+
+* `/commands` – Prints all commands supported by the bot.
+        This will essentially print `hello - says hello world`. Yes! This is the information we supplied to the ability. The bot prints the commands in the format accepted by `BotFather`. So, whenever you change, add or remove commands, you can simply send `/commands` to your bot and forward that message to `BotFather`.
+* `/claim` – Claims this bot
+* `/backup` – returns a backup of the bot database
+* `/recover` – recovers the database
+* `/promote @username` – promotes user to bot admin
+* `/demote @username` – demotes bot admin to user
+* `/ban @username` – bans the user from accessing your bot commands and features
+* `/unban @username` – lifts the ban from the user
 
