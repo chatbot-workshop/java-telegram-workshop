@@ -247,3 +247,23 @@ Wait! Since you've implemented an ability bot, you get factory abilities as well
 * `/ban @username` – bans the user from accessing your bot commands and features
 * `/unban @username` – lifts the ban from the user
 
+== Replies
+
+A reply is AbilityBot's swiss army knife. It comes in two variants and is able to handle all possible use cases.
+
+=== Standalon Reply
+
+Standalone replies do not need abilities. Lets add one to our bot:
+
+```java
+public Reply replyToPhoto() {
+  return Reply.of(
+      update -> silent.send("Nice pic!", getChatId(update)),
+      Flag.PHOTO);
+}
+```
+
+As you can see, you just provide a lambda function which consumes the update. In addition to the required lambda function, replies can have optional predicates. In our example we let the bot know, that we only want to reply to images. Take a look at the `Flag` enum.
+
+Wow, that was easy! How easy would it be to implement a `VoxxedDaysBucharestBot`, where you can send pictures which are automatically uploaded to a Google Drive (or similar) share? If you are a nerd and finish this workshop early, try to implement it…
+

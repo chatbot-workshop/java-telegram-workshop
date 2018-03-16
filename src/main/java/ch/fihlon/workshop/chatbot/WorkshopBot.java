@@ -89,4 +89,10 @@ public class WorkshopBot extends AbilityBot {
                 .build();
     }
 
+    public Reply replyToPhoto() {
+        return Reply.of(
+                update -> silent.send("Nice pic!", getChatId(update)),
+                Flag.PHOTO);
+    }
+
 }
