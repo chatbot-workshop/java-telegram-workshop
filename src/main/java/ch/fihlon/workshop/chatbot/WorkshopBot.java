@@ -95,4 +95,28 @@ public class WorkshopBot extends AbilityBot {
                 Flag.PHOTO);
     }
 
+    public Ability sayHi() {
+        return Ability
+                .builder()
+                .name("hi")
+                .info("says hi")
+                .locality(ALL)
+                .privacy(PUBLIC)
+                .action(context -> {
+                    final String firstName = context.user().firstName();
+                    silent.send("Hi, " + firstName, context.chatId());
+                })
+                .reply(
+                        update -> silent.send("Wow, nice name!", update.getMessage().getChatId()),
+                        TEXT,
+                        update -> update.getMessage().getText().startsWith("/hi"),
+                        isMarcus()
+                )
+                .build();
+    }
+
+    private Predicate<Update> isMarcus() {
+        return update -> update.getMessage().getFrom().getFirstName().equalsIgnoreCase("Marcus");
+    }
+
 }

@@ -267,3 +267,35 @@ As you can see, you just provide a lambda function which consumes the update. In
 
 Wow, that was easy! How easy would it be to implement a `VoxxedDaysBucharestBot`, where you can send pictures which are automatically uploaded to a Google Drive (or similar) share? If you are a nerd and finish this workshop early, try to implement it…
 
+=== Ability Reply and own Predicates
+
+In exactly the same manner, you are able to attach replies to abilities. This way you can localize replies that relate to the same ability.
+
+```java
+public Ability sayHi() {
+  return Ability
+    .builder()
+    .name("hi")
+    .info("says hi")
+    .locality(ALL)
+    .privacy(PUBLIC)
+    .action(context -> {
+      final String firstName = context.user().firstName();
+      silent.send("Hi, " + firstName, context.chatId());
+    })
+    .reply(
+        update -> silent.send("Wow, nice name!", update.getMessage().getChatId()),
+        TEXT,
+        update -> update.getMessage().getText().startsWith("/hi"),
+        isMarcus()
+    )
+    .build();
+}
+
+private Predicate<Update> isMarcus() {
+  return update -> update.getMessage().getFrom().getFirstName().equalsIgnoreCase("Marcus");
+}
+```
+
+In this example you can see how easy it is to create and use your own predicates. Using predicates, you can implement all checks, so your logic keeps clean and can focus on action.
+
