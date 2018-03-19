@@ -119,4 +119,37 @@ public class WorkshopBot extends AbilityBot {
         return update -> update.getMessage().getFrom().getFirstName().equalsIgnoreCase("Marcus");
     }
 
+    public Ability counter() {
+        return Ability.builder()
+                .name("count")
+                .info("increments a counter per user")
+                .privacy(PUBLIC)
+                .locality(ALL)
+                .action(context -> {
+                    final Map<String, Integer> counterMap = db.getMap("COUNTERS");
+                    final int userId = context.user().id();
+                    final Integer counter = counterMap.compute(
+                            String.valueOf(userId), (id, count) -> count == null ? 1 : ++count);
+                    final String message = String.format("%s, your count is now %d!",
+                            context.user().shortName(), counter);
+                    silent.send(message, context.chatId());
+                })
+                .build();
+    }
+
+    public Ability contacts() {
+        return Ability.builder()
+                .name("contacts")
+                .info("lists all users who contacted this bot")
+                .privacy(PUBLIC)
+                .locality(ALL)
+                .action(context -> {
+                    final Map<String, EndUser> usersMap = db.getMap("USERS");
+                    final String users = usersMap.values().stream().map(EndUser::username).collect(joining(", "));
+                    final String message = "The following users already contacted me: " + users;
+                    silent.send(message, context.chatId());
+                })
+                .build();
+    }
+
 }

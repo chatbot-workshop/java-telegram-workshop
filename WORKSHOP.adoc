@@ -299,3 +299,54 @@ private Predicate<Update> isMarcus() {
 
 In this example you can see how easy it is to create and use your own predicates. Using predicates, you can implement all checks, so your logic keeps clean and can focus on action.
 
+== Database Handling
+
+If you use the ability bot, you have an integrated database.
+
+=== Persistent Counter
+
+Let's use it to implement a simple counter:
+
+```java
+public Ability counter() {
+  return Ability.builder()
+      .name("count")
+      .info("increments a counter per user")
+      .privacy(PUBLIC)
+      .locality(ALL)
+      .action(context -> {
+        final Map<String, Integer> counterMap = db.getMap("COUNTERS");
+        final int userId = context.user().id();
+        final Integer counter = counterMap.compute(
+            String.valueOf(userId), (id, count) -> count == null ? 1 : ++count);
+        final String message = String.format("%s, your count is now %d!",
+            context.user().shortName(), counter);
+        silent.send(message, context.chatId());
+      })
+      .build();
+}
+```
+
+As you can see, the interface to the database is just a simple map. Cool, we can now implement actions that need persistence.
+
+=== Automatic Contacts
+
+The ability bot automatically stores basic user information of every user, who contacted your bot. So we have some kind of an automatically contact list. We can access this list very easy:
+
+```java
+public Ability contacts() {
+  return Ability.builder()
+      .name("contacts")
+      .info("lists all users who contacted this bot")
+      .privacy(PUBLIC)
+      .locality(ALL)
+      .action(context -> {
+        final Map<String, EndUser> usersMap = db.getMap("USERS");
+        final String users = usersMap.values().stream().map(EndUser::username).collect(joining(", "));
+        final String message = "The following users already contacted me: " + users;
+        silent.send(message, context.chatId());
+      })
+      .build();
+}
+```
+
