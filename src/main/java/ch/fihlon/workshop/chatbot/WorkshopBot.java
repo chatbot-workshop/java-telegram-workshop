@@ -152,4 +152,48 @@ public class WorkshopBot extends AbilityBot {
                 .build();
     }
 
+    public Reply savePhoto() {
+        return Reply.of(
+                update -> {
+                    final List<PhotoSize> photos = update.getMessage().getPhoto();
+                    final PhotoSize photoSize = photos.stream()
+                            .max(Comparator.comparing(PhotoSize::getFileSize))
+                            .orElse(null);
+                    if (photoSize != null) {
+                        final String filePath = getFilePath(photoSize);
+                        final File file = downloadPhoto(filePath);
+                        System.out.println("Temporary file: " + file);
+                        silent.send("Yeah, I got it!", getChatId(update));
+                        sendPhotoFromFileId(photoSize.getFileId(), getChatId(update));
+                    } else {
+                        silent.send("Houston, we have a problem!", getChatId(update));
+                    }
+                },
+                Flag.PHOTO);
+    }
+
+    private String getFilePath(final PhotoSize photo) {
+        if (photo.hasFilePath()) {
+            return photo.getFilePath();
+        }
+        final GetFile getFileMethod = new GetFile();
+        getFileMethod.setFileId(photo.getFileId());
+        try {
+            final org.telegram.telegrambots.api.objects.File file = execute(getFileMethod);
+            return file.getFilePath();
+        } catch (final TelegramApiException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public File downloadPhoto(final String filePath) {
+        try {
+            return downloadFile(filePath);
+        } catch (final TelegramApiException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }

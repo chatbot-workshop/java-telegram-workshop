@@ -350,3 +350,89 @@ public Ability contacts() {
 }
 ```
 
+== Photos
+
+=== Receiving Photos
+
+The process of receiving a photo is not very intuitive. Maybe it will be improved in the future. Anyway, let's try to get the photo out of the message and store it to the filesystem.
+
+From Telegram we do not get the photo directly. Instead, we get a list of `PhotoSize` objects. A list? Yeas, the photo will be available in different sizes. If the sender sends a photo from his mobile device, it will be displayed in the chat history as a thumbnail. That's why one photo will end up in a list of `PhotoSize` objects. In our case, we want the original photo in the original size, so we sort that list by size and take the biggest one.
+
+```java
+public Reply savePhoto() {
+  return Reply.of(
+      update -> {
+        final List<PhotoSize> photos = update.getMessage().getPhoto();
+        final PhotoSize photoSize = photos.stream()
+            .max(Comparator.comparing(PhotoSize::getFileSize))
+            .orElse(null);
+        if (photoSize != null) {
+          // TODO download the photo
+          silent.send("Yeah, I got it!", getChatId(update));
+        } else {
+          silent.send("Houston, we have a problem!", getChatId(update));
+        }
+      },
+      Flag.PHOTO);
+  }
+```
+
+So far, so good. but there is still no photo, just a `PhotoSize` object. We have to actively download the photo in that size, we want, to reduce network traffic and server load. But to download a photo, we first need to get the file path of the photo. Sometimes photos already have a file path, sometimes not – then we have to ask Telegram for it. This is how we do that:
+
+```java
+private String getFilePath(final PhotoSize photo) {
+  if (photo.hasFilePath()) {
+    return photo.getFilePath();
+  }
+  final GetFile getFileMethod = new GetFile();
+  getFileMethod.setFileId(photo.getFileId());
+  try {
+    final org.telegram.telegrambots.api.objects.File file = execute(getFileMethod);
+    return file.getFilePath();
+  } catch (final TelegramApiException e) {
+    e.printStackTrace();
+  }
+  return null;
+}
+```
+
+Be careful to use the correct `File` object!
+
+Using the file path we are now able to download the photo from Telegram. Luckily, this task is very easy:
+
+```java
+public File downloadPhoto(final String filePath) {
+  try {
+    return downloadFile(filePath);
+  } catch (final TelegramApiException e) {
+    e.printStackTrace();
+  }
+  return null;
+}
+```
+
+With these two helper methods we can now finish our `savePhoto` method:
+
+```java
+public Reply savePhoto() {
+  return Reply.of(
+      update -> {
+          final List<PhotoSize> photos = update.getMessage().getPhoto();
+          final PhotoSize photoSize = photos.stream()
+              .max(Comparator.comparing(PhotoSize::getFileSize))
+              .orElse(null);
+          if (photoSize != null) {
+            final String filePath = getFilePath(photoSize);
+            final File file = downloadPhoto(filePath);
+            System.out.println("Temporary file: " + file);
+            silent.send("Yeah, I got it!", getChatId(update));
+          } else {
+            silent.send("Houston, we have a problem!", getChatId(update));
+          }
+      },
+      Flag.PHOTO);
+}
+```
+
+Uff, done! Try it and send a photo to your bot! On the console you can see the temporary file on the bot host. Now you can easily continue and move it everywhere you like or implement some filter magic and send the photo back to the user.
+
