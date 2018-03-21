@@ -196,4 +196,59 @@ public class WorkshopBot extends AbilityBot {
         return null;
     }
 
+    public Ability sendLogo() {
+        return Ability
+                .builder()
+                .name("logo")
+                .info("send the logo")
+                .locality(ALL)
+                .privacy(PUBLIC)
+                .action(context -> sendPhotoFromUrl("https://www.fihlon.ch/images/logo.png", context.chatId()))
+                .build();
+    }
+
+    private void sendPhotoFromUrl(final String url, final Long chatId) {
+        final SendPhoto sendPhotoRequest = new SendPhoto(); // 1
+        sendPhotoRequest.setChatId(chatId);                 // 2
+        sendPhotoRequest.setPhoto(url);                     // 3
+        try {
+            sendPhoto(sendPhotoRequest);                    // 4
+        } catch (final TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendPhotoFromFileId(final String fileId, final Long chatId) {
+        final SendPhoto sendPhotoRequest = new SendPhoto(); // 1
+        sendPhotoRequest.setChatId(chatId);                 // 2
+        sendPhotoRequest.setPhoto(fileId);                  // 3
+        try {
+            sendPhoto(sendPhotoRequest);                    // 4
+        } catch (final TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Ability sendIcon() {
+        return Ability
+                .builder()
+                .name("icon")
+                .info("send the icon")
+                .locality(ALL)
+                .privacy(PUBLIC)
+                .action(context -> sendPhotoFromUpload("src/main/resources/chatbot.jpg", context.chatId()))
+                .build();
+    }
+
+    public void sendPhotoFromUpload(final String filePath, final Long chatId) {
+        final SendPhoto sendPhotoRequest = new SendPhoto(); // 1
+        sendPhotoRequest.setChatId(chatId);                 // 2
+        sendPhotoRequest.setNewPhoto(new File(filePath));   // 3
+        try {
+            sendPhoto(sendPhotoRequest);                    // 4
+        } catch (final TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

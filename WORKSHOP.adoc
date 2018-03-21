@@ -436,3 +436,111 @@ public Reply savePhoto() {
 
 Uff, done! Try it and send a photo to your bot! On the console you can see the temporary file on the bot host. Now you can easily continue and move it everywhere you like or implement some filter magic and send the photo back to the user.
 
+=== Sending Photos
+
+Compared to receiving a photo it is very easy to send a photo. There are three ways to do send a photo and all the three ways have the following four steps in common:
+
+. Create send method
+. Set destination chat id
+. Set the photo
+. Send the photo
+
+==== Send Photo from URL
+
+In this example we implement a `/logo` command which will, difficult to guess, send a logo:
+
+```java
+public Ability sendLogo() {
+  return Ability
+      .builder()
+      .name("logo")
+      .info("send the logo")
+      .locality(ALL)
+      .privacy(PUBLIC)
+      .action(context -> sendPhotoFromUrl("https://www.fihlon.ch/images/logo.png", context.chatId()))
+      .build();
+}
+
+private void sendPhotoFromUrl(final String url, final Long chatId) {
+  final SendPhoto sendPhotoRequest = new SendPhoto(); // 1
+  sendPhotoRequest.setChatId(chatId);                 // 2
+  sendPhotoRequest.setPhoto(url);                     // 3
+  try {
+    sendPhoto(sendPhotoRequest);                      // 4
+  } catch (final TelegramApiException e) {
+    e.printStackTrace();
+  }
+}
+```
+
+==== Send Photo from File ID
+
+This is especially useful, if your bot receives a photo and wants to forward ist. The file id is on the `PhotoSize` object and the bot does not need to download the photo before it forwards (sends) the photo another user.
+
+To test this, we extend our previously written `savePhoto` method that it sends the received photo back to the sender by using the file id of the photo. First, the implementation of the `sendPhotoFromFileId`:
+
+```java
+public void sendPhotoFromFileId(final String fileId, final Long chatId) {
+  final SendPhoto sendPhotoRequest = new SendPhoto(); // 1
+  sendPhotoRequest.setChatId(chatId);                 // 2
+  sendPhotoRequest.setPhoto(fileId);                  // 3
+  try {
+    sendPhoto(sendPhotoRequest);                     // 4
+  } catch (final TelegramApiException e) {
+    e.printStackTrace();
+  }
+}
+```
+
+Here you can see the modified `savePhoto` method, we just added one line:
+
+```java
+public Reply savePhoto() {
+  return Reply.of(
+      update -> {
+          final List<PhotoSize> photos = update.getMessage().getPhoto();
+          final PhotoSize photoSize = photos.stream()
+              .max(Comparator.comparing(PhotoSize::getFileSize))
+              .orElse(null);
+          if (photoSize != null) {
+            final String filePath = getFilePath(photoSize);
+            final File file = downloadPhoto(filePath);
+            System.out.println("Temporary file: " + file);
+            silent.send("Yeah, I got it!", getChatId(update));
+            sendPhotoFromFileId(photoSize.getFileId(), getChatId(update)); // here
+          } else {
+            silent.send("Houston, we have a problem!", getChatId(update));
+          }
+      },
+      Flag.PHOTO);
+}
+```
+
+==== Upload and send a Photo
+
+This is so easy, you just need to specify a `File` object! The photo will be uploaded to Telegram and send to the user:
+
+```java
+public Ability sendIcon() {
+  return Ability
+      .builder()
+      .name("icon")
+      .info("send the icon")
+      .locality(ALL)
+      .privacy(PUBLIC)
+      .action(context -> sendPhotoFromUpload("src/main/resources/chatbot.jpg", context.chatId()))
+      .build();
+}
+
+public void sendPhotoFromUpload(final String filePath, final Long chatId) {
+  final SendPhoto sendPhotoRequest = new SendPhoto(); // 1
+  sendPhotoRequest.setChatId(chatId);                 // 2
+  sendPhotoRequest.setNewPhoto(new File(filePath));   // 3
+  try {
+    sendPhoto(sendPhotoRequest);                      // 4
+  } catch (final TelegramApiException e) {
+    e.printStackTrace();
+  }
+}
+```
+
