@@ -251,4 +251,42 @@ public class WorkshopBot extends AbilityBot {
         }
     }
 
+    public Ability sendKeyboard() {
+        return Ability
+                .builder()
+                .name("keyboard")
+                .info("send a custom keyboard")
+                .locality(ALL)
+                .privacy(PUBLIC)
+                .action(context -> {
+                    final SendMessage message = new SendMessage();
+                    message.setChatId(context.chatId());
+                    message.setText("Enjoy this wonderful keyboard!");
+
+                    final ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+                    final List<KeyboardRow> keyboard = new ArrayList<>();
+
+                    // row 1
+                    KeyboardRow row = new KeyboardRow();
+                    row.add("/hello");
+                    row.add("/hi");
+                    row.add("/count");
+                    keyboard.add(row);
+
+                    // row 2
+                    row = new KeyboardRow();
+                    row.add("/contacts");
+                    row.add("/logo");
+                    row.add("/icon");
+                    keyboard.add(row);
+
+                    // activate the keyboard
+                    keyboardMarkup.setKeyboard(keyboard);
+                    message.setReplyMarkup(keyboardMarkup);
+
+                    silent.execute(message);
+                })
+                .build();
+    }
+
 }
