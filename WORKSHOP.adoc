@@ -658,3 +658,100 @@ public Ability sayNo() {
 }
 ```
 
+== Testing
+
+=== Dependencies
+
+Better late than never – let's talk about testing. For testing our bot we need the help of a mocking library. Please add the following dependency to your project:
+
+```groovy
+testCompile group: 'org.mockito', name: 'mockito-core', version: '2.16.0'
+```
+
+=== Prepare your Bot
+
+In some of our abilities we use a database connection. We need to add an additional constructor to be able to inject a database for the tests:
+
+```java
+@VisibleForTesting
+public WorkshopBot(final DBContext db) {
+  super(BOT_TOKEN, BOT_USERNAME, db);
+}
+```
+
+To prevent that the live system of Telegram is used, we need to inject mocks for the `MessageSender` and `SilentSender`. To be able to do this, we add the following two methods to our bot:
+
+```java
+@VisibleForTesting
+void setSender(final MessageSender sender) {
+  this.sender = sender;
+}
+
+@VisibleForTesting
+void setSilent(final SilentSender silent) {
+  this.silent = silent;
+}
+```
+
+=== Prepare the Test
+
+. In some of our abilities we use a database connection. For the tests we create a separate database instance which will be deleted on JVM shutdown automatically.
+. We create an instance of our bot and inject our test database into it.
+. We need to mock the sender to prevent the use of the live Telegram API.
+. We inject the sender into our bot.
+. We create and inject the silent object into our bot.
+
+
+```java
+public class WorkshopBotTest {
+
+  private WorkshopBot bot;
+  private DBContext db;
+  private MessageSender sender;
+
+  @Before
+  public void setUp() {
+    db = MapDBContext.offlineInstance("test"); // 1
+    bot = new WorkshopBot(db);                 // 2
+    sender = mock(MessageSender.class);        // 3
+    bot.setSender(sender);                     // 4
+    bot.setSilent(new SilentSender(sender));   // 5
+  }
+
+  @After
+  public void tearDown() {
+    db.clear();
+  }
+
+}
+```
+
+=== Simple Test
+
+First, we take a very simple test case: Our "Hello World" example. The test for this ability would be:
+
+```java
+private static final int USER_ID = 12345;
+private static final long CHAT_ID = 12345L;
+
+@Test
+public void sayHelloWorld() throws TelegramApiException {
+  final Update mockedUpdate = mock(Update.class);
+  final EndUser endUser = EndUser.endUser(USER_ID, "Foo", "Bar", "foobar42");
+  final MessageContext context = MessageContext.newContext(mockedUpdate, endUser, CHAT_ID);
+
+  bot.sayHelloWorld().action().accept(context);
+
+  final SendMessage message = new SendMessage();
+  message.setChatId(CHAT_ID);
+  message.setText("Hello world");
+  verify(sender, times(1)).execute(message);
+}
+```
+
+In the first code block we mock the `Update` class, which is used by the context object. Then we create an `EndUser` for our test case and create a new context object with all needed information.
+
+The one line in the middle block executes our bot ability.
+
+The last block does the assertions. In this example we check, that the message was send exactly once to the correct chat. Therefore we need a message object with the text and chat id for the `verify` method of Mockito.
+

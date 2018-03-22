@@ -330,4 +330,14 @@ public class WorkshopBot extends AbilityBot {
                 .build();
     }
 
+    @VisibleForTesting
+    void setSender(final MessageSender sender) {
+        this.sender = sender;
+    }
+
+    @VisibleForTesting
+    void setSilent(final SilentSender silent) {
+        this.silent = silent;
+    }
+
 }
