@@ -485,7 +485,7 @@ public void sendPhotoFromFileId(final String fileId, final Long chatId) {
   sendPhotoRequest.setChatId(chatId);                 // 2
   sendPhotoRequest.setPhoto(fileId);                  // 3
   try {
-    sendPhoto(sendPhotoRequest);                     // 4
+    sendPhoto(sendPhotoRequest);                      // 4
   } catch (final TelegramApiException e) {
     e.printStackTrace();
   }
