@@ -304,4 +304,21 @@ public class WorkshopBot extends AbilityBot {
                 .build();
     }
 
+    public Ability add() {
+        return Ability
+                .builder()
+                .name("add")
+                .info("adds to numbers")
+                .locality(ALL)
+                .privacy(PUBLIC)
+                .input(2)
+                .action(context -> {
+                    final int a = Integer.parseInt(context.firstArg());
+                    final int b = Integer.parseInt(context.secondArg());
+                    final int sum = a + b;
+                    silent.send(String.format("The sum of %d and %d is %d", a, b, sum), context.chatId());
+                })
+                .build();
+    }
+
 }
