@@ -597,3 +597,24 @@ public Ability sendKeyboard() {
 }
 ```
 
+== Formatted Messages
+
+To send formatted messages, you can use Markdown syntax. As of today, Telegram supports only a small subset of markdown. To activate Markdown support for a message, use `sendMd(…)` instead of just `send(…)`.
+
+```java
+public Ability format() {
+  return Ability
+      .builder()
+      .name("format")
+      .info("formats the message")
+      .locality(ALL)
+      .privacy(PUBLIC)
+      .action(context -> {
+        silent.sendMd("You can make text *bold* or _italic_.", context.chatId());
+        silent.sendMd("`This is code.`", context.chatId());
+        silent.sendMd("```\nThis\nis\nmulti\nline\ncode.\n```", context.chatId());
+      })
+      .build();
+}
+```
+

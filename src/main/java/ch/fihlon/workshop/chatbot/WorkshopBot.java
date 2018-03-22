@@ -289,4 +289,19 @@ public class WorkshopBot extends AbilityBot {
                 .build();
     }
 
+    public Ability format() {
+        return Ability
+                .builder()
+                .name("format")
+                .info("formats the message")
+                .locality(ALL)
+                .privacy(PUBLIC)
+                .action(context -> {
+                    silent.sendMd("You can make text *bold* or _italic_.", context.chatId());
+                    silent.sendMd("`This is code.`", context.chatId());
+                    silent.sendMd("```\nThis\nis\nmulti\nline\ncode.\n```", context.chatId());
+                })
+                .build();
+    }
+
 }
