@@ -755,3 +755,15 @@ The one line in the middle block executes our bot ability.
 
 The last block does the assertions. In this example we check, that the message was send exactly once to the correct chat. Therefore we need a message object with the text and chat id for the `verify` method of Mockito.
 
+== Additional Exercises
+
+. Instead of adding just text to the `KeyboardRow` object, try to use `KeyboardButton` objects.
+. Add a button to send the users phone number to the bot.
+. Add a button to send the current location of the user to the bot.
+. Reply to the phone number and location with a confirmation message.
+. In addition to using the `ReplyKeyboardMarkup`, take a look at `ReplyKeyboardHide`, `ForceReply` and `InlineKeyboardMarkup` and try to use them.
+. Extend the `/add` command to accept an unlimited number of numbers.
+. Write tests for all abilities of your bot.
+. Refactor your bot into smaller classes (create smaller bots which focus on one topic)
+. Tell the `BotFather` which commands are accepted by your bot.
+. Provide feedback to me about this workshop.
