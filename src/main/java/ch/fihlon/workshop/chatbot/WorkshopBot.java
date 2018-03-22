@@ -54,8 +54,8 @@ import static org.telegram.abilitybots.api.util.AbilityUtils.getChatId;
 
 public class WorkshopBot extends AbilityBot {
 
-    private static String BOT_TOKEN = "381467743:AAGJAtBZpqcqFHRFcSfzd3LZZTlYKf674ow";
-    private static String BOT_USERNAME = "McPringleBot";
+    private static String BOT_TOKEN = "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private static String BOT_USERNAME = "MyWorkshopBot";
 
     public static void main(String[] args) throws TelegramApiRequestException {
         ApiContextInitializer.init();
@@ -75,7 +75,7 @@ public class WorkshopBot extends AbilityBot {
 
     @Override
     public int creatorId() {
-        return 318585602;
+        return 1234567890;
     }
 
     public Ability sayHelloWorld() {
