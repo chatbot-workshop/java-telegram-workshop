@@ -321,4 +321,13 @@ public class WorkshopBot extends AbilityBot {
                 .build();
     }
 
+    public Ability sayNo() {
+        return Ability.builder()
+                .name(DEFAULT)
+                .privacy(PUBLIC)
+                .locality(ALL)
+                .action(context -> silent.send("Sorry, I have no answer for you today.", context.chatId()))
+                .build();
+    }
+
 }
