@@ -3,6 +3,7 @@
 /.idea
 /.project
 /.settings
+/.vscode
 /bin
 /build
 /out
