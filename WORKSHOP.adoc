@@ -301,7 +301,7 @@ In this example you can see how easy it is to create and use your own predicates
 
 == Database Handling
 
-If you use the ability bot, you have an integrated database.
+If you use the ability bot, you have an integrated database. To persist the data, a file with the name of your bot is created in the working directory (depending on your IDE, usually project root folder).
 
 === Persistent Counter
 
@@ -766,4 +766,5 @@ The last block does the assertions. In this example we check, that the message w
 . Write tests for all abilities of your bot.
 . Refactor your bot into smaller classes (create smaller bots which focus on one topic)
 . Tell the `BotFather` which commands are accepted by your bot.
+. Refactor your bot to always inject a database. Specify the name of the database file.
 . Provide feedback to me about this workshop.
