@@ -10,6 +10,8 @@ Copyright (c) 2018 https://www.fihlon.ch/[Marcus Fihlon]
 - You need your own Telegram account
 - You need Telegram installed on your mobile or desktop
 
+WARNING: As of today, **Java 9+ is not supported** for this workshop. We use the https://github.com/rubenlagus/TelegramBots[Telegram Java API], which has a dependency to https://github.com/jankotek/mapdb[mapDB], which is not compatible to Java 9+ due to the use of undocumented internal SUN Java API.
+
 == Register
 
 Use Telegram to talk to the `BotFather` to register a new bot. Write down your bot username and your bot token.
