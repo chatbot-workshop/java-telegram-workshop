@@ -21,6 +21,7 @@ package ch.fihlon.workshop.chatbot;
 import com.google.common.annotations.VisibleForTesting;
 import org.telegram.abilitybots.api.bot.AbilityBot;
 import org.telegram.abilitybots.api.db.DBContext;
+import org.telegram.abilitybots.api.db.MapDBContext;
 import org.telegram.abilitybots.api.objects.Ability;
 import org.telegram.abilitybots.api.objects.EndUser;
 import org.telegram.abilitybots.api.objects.Flag;
@@ -59,16 +60,12 @@ public class WorkshopBot extends AbilityBot {
 
     public static void main(String[] args) throws TelegramApiRequestException {
         ApiContextInitializer.init();
+        final DBContext db = MapDBContext.onlineInstance("bot.db");
+        final WorkshopBot bot = new WorkshopBot(db);
         final TelegramBotsApi api = new TelegramBotsApi();
-        final WorkshopBot bot = new WorkshopBot();
         api.registerBot(bot);
     }
 
-    public WorkshopBot() {
-        super(BOT_TOKEN, BOT_USERNAME);
-    }
-
-    @VisibleForTesting
     public WorkshopBot(final DBContext db) {
         super(BOT_TOKEN, BOT_USERNAME, db);
     }
