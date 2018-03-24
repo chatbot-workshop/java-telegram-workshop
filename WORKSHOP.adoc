@@ -89,7 +89,7 @@ public String getBotToken() {
 
 === React on a message
 
-In the third method you write your code which will be executed when your bot receives a message. For uour first example we will just send the same message back to the sender:
+In the third method you write your code which will be executed when your bot receives a message. For our first example we will just send the same message back to the sender:
 
 ```java
 @Override
