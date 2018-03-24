@@ -744,7 +744,7 @@ public void sayHelloWorld() throws TelegramApiException {
 
   final SendMessage message = new SendMessage();
   message.setChatId(CHAT_ID);
-  message.setText("Hello world");
+  message.setText("Hello world!");
   verify(sender, times(1)).execute(message);
 }
 ```
