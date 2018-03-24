@@ -20,9 +20,12 @@ group 'ch.fihlon.workshop.chatbot'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
+apply plugin: 'application'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
+
+mainClassName = 'ch.fihlon.workshop.chatbot.WorkshopBot'
 
 repositories {
     mavenCentral()
