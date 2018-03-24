@@ -16,7 +16,20 @@ Use Telegram to talk to the `BotFather` to register a new bot. Write down your b
 
 == Project setup
 
-For this workshop we use gradle. Please create a new gradle project using your IDE.
+For this workshop we use gradle. Please create a new gradle project using your IDE. I highly recommend to use the gradle application plugin to easily start you bot from the command line:
+
+```groovy
+apply plugin: 'application'
+mainClassName = 'ch.fihlon.workshop.chatbot.WorkshopBot'
+```
+
+Of course, you may have to modify the `mainClassName` according your package structure and bot name. To run your bot (while you follow this workshop), just run the following command on your commandline:
+
+```bash
+./gradlew run
+```
+
+On Windows, you may have to replace `/` by `\`.
 
 == Getting started
 
