@@ -164,8 +164,8 @@ The easy part: Add the token and username of your bot as constants to your class
 ```java
 public class WorkshopBot extends AbilityBot {
 
-  private static String BOT_TOKEN = "381467743:AAGJAtBZpqcqFHRFcSfzd3LZZTlYKf674ow";
-  private static String BOT_USERNAME = "McPringleBot";
+  private static String BOT_TOKEN = "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  private static String BOT_USERNAME = "MyWorkshopBot";
 
   public WorkshopBot() {
     super(BOT_TOKEN, BOT_USERNAME);
