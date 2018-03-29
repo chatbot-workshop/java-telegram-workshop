@@ -4,7 +4,7 @@ ifdef::env-github[:outfilesuffix: .adoc]
 image:https://travis-ci.org/chatbot-workshop/java-telegram-workshop.svg?branch=master["Build Status", link="https://travis-ci.org/chatbot-workshop/java-telegram-workshop"]
 image:https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg["gitmoji", link="https://gitmoji.carloscuesta.me"]
 
-*This repository is part of the chatbot workshop with https://www.fihlon.ch/[Marcus Fihlon].*
+*This repository is part of the chat bot workshop with https://www.fihlon.ch/[Marcus Fihlon].*
 
 == Copyright and Licensing
 

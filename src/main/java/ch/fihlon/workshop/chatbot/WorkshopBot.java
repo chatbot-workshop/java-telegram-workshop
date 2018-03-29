@@ -1,5 +1,5 @@
 /*
- * Chatbot Workshop
+ * ChatBot Workshop
  * Copyright (C) 2018 Marcus Fihlon
  *
  * This program is free software: you can redistribute it and/or modify
