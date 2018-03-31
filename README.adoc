@@ -1,4 +1,4 @@
-= Chatbot Workshop
+= Java & Telegram ChatBot Workshop
 ifdef::env-github[:outfilesuffix: .adoc]
 
 image:https://travis-ci.org/chatbot-workshop/java-telegram-workshop.svg?branch=master["Build Status", link="https://travis-ci.org/chatbot-workshop/java-telegram-workshop"]

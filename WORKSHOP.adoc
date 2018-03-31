@@ -1,4 +1,4 @@
-= Chatbot Workshop
+= Java & Telegram ChatBot Workshop
 
 Copyright (c) 2018 https://www.fihlon.ch/[Marcus Fihlon]
 
