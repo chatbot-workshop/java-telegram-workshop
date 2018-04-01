@@ -66,7 +66,7 @@ public class WorkshopBot extends AbilityBot {
         api.registerBot(bot);
     }
 
-    public WorkshopBot(final DBContext db) {
+    WorkshopBot(final DBContext db) {
         super(BOT_TOKEN, BOT_USERNAME, db);
     }
 
@@ -184,7 +184,7 @@ public class WorkshopBot extends AbilityBot {
         return null;
     }
 
-    public File downloadPhoto(final String filePath) {
+    private File downloadPhoto(final String filePath) {
         try {
             return downloadFile(filePath);
         } catch (final TelegramApiException e) {
@@ -215,7 +215,7 @@ public class WorkshopBot extends AbilityBot {
         }
     }
 
-    public void sendPhotoFromFileId(final String fileId, final Long chatId) {
+    private void sendPhotoFromFileId(final String fileId, final Long chatId) {
         final SendPhoto sendPhotoRequest = new SendPhoto(); // 1
         sendPhotoRequest.setChatId(chatId);                 // 2
         sendPhotoRequest.setPhoto(fileId);                  // 3
@@ -237,7 +237,7 @@ public class WorkshopBot extends AbilityBot {
                 .build();
     }
 
-    public void sendPhotoFromUpload(final String filePath, final Long chatId) {
+    private void sendPhotoFromUpload(final String filePath, final Long chatId) {
         final SendPhoto sendPhotoRequest = new SendPhoto(); // 1
         sendPhotoRequest.setChatId(chatId);                 // 2
         sendPhotoRequest.setNewPhoto(new File(filePath));   // 3

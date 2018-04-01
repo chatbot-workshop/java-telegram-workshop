@@ -161,7 +161,7 @@ Create a class `WorkshopBot` that extends `AbilityBot` and add a no argument con
 ```java
 public class WorkshopBot extends AbilityBot {
 
-  public WorkshopBot() {
+  WorkshopBot() {
     super(null, null);
   }
 
@@ -182,7 +182,7 @@ public class WorkshopBot extends AbilityBot {
   private static String BOT_TOKEN = "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   private static String BOT_USERNAME = "MyWorkshopBot";
 
-  public WorkshopBot() {
+  WorkshopBot() {
     super(BOT_TOKEN, BOT_USERNAME);
   }
 
@@ -416,7 +416,7 @@ Be careful to use the correct `File` object!
 Using the file path we are now able to download the photo from Telegram. Luckily, this task is very easy:
 
 ```java
-public File downloadPhoto(final String filePath) {
+private File downloadPhoto(final String filePath) {
   try {
     return downloadFile(filePath);
   } catch (final TelegramApiException e) {
@@ -495,7 +495,7 @@ This is especially useful, if your bot receives a photo and wants to forward ist
 To test this, we extend our previously written `savePhoto` method that it sends the received photo back to the sender by using the file id of the photo. First, the implementation of the `sendPhotoFromFileId`:
 
 ```java
-public void sendPhotoFromFileId(final String fileId, final Long chatId) {
+private void sendPhotoFromFileId(final String fileId, final Long chatId) {
   final SendPhoto sendPhotoRequest = new SendPhoto(); // 1
   sendPhotoRequest.setChatId(chatId);                 // 2
   sendPhotoRequest.setPhoto(fileId);                  // 3
@@ -547,7 +547,7 @@ public Ability sendIcon() {
       .build();
 }
 
-public void sendPhotoFromUpload(final String filePath, final Long chatId) {
+private void sendPhotoFromUpload(final String filePath, final Long chatId) {
   final SendPhoto sendPhotoRequest = new SendPhoto(); // 1
   sendPhotoRequest.setChatId(chatId);                 // 2
   sendPhotoRequest.setNewPhoto(new File(filePath));   // 3
@@ -689,7 +689,7 @@ In some of our abilities we use a database connection. We need to add an additio
 
 ```java
 @VisibleForTesting
-public WorkshopBot(final DBContext db) {
+WorkshopBot(final DBContext db) {
   super(BOT_TOKEN, BOT_USERNAME, db);
 }
 ```
