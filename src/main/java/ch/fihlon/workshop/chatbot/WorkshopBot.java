@@ -75,6 +75,7 @@ public class WorkshopBot extends AbilityBot {
         return 1234567890;
     }
 
+    @SuppressWarnings({"unused", "WeakerAccess"})
     public Ability sayHelloWorld() {
         return Ability
                 .builder()
@@ -86,12 +87,14 @@ public class WorkshopBot extends AbilityBot {
                 .build();
     }
 
+    @SuppressWarnings({"unused", "WeakerAccess"})
     public Reply replyToPhoto() {
         return Reply.of(
                 update -> silent.send("Nice pic!", getChatId(update)),
                 Flag.PHOTO);
     }
 
+    @SuppressWarnings({"unused", "WeakerAccess"})
     public Ability sayHi() {
         return Ability
                 .builder()
@@ -116,6 +119,7 @@ public class WorkshopBot extends AbilityBot {
         return update -> update.getMessage().getFrom().getFirstName().equalsIgnoreCase("Marcus");
     }
 
+    @SuppressWarnings({"unused", "WeakerAccess"})
     public Ability counter() {
         return Ability.builder()
                 .name("count")
@@ -134,6 +138,7 @@ public class WorkshopBot extends AbilityBot {
                 .build();
     }
 
+    @SuppressWarnings({"unused", "WeakerAccess"})
     public Ability contacts() {
         return Ability.builder()
                 .name("contacts")
@@ -149,6 +154,7 @@ public class WorkshopBot extends AbilityBot {
                 .build();
     }
 
+    @SuppressWarnings({"unused", "WeakerAccess"})
     public Reply savePhoto() {
         return Reply.of(
                 update -> {
@@ -193,6 +199,7 @@ public class WorkshopBot extends AbilityBot {
         return null;
     }
 
+    @SuppressWarnings({"unused", "WeakerAccess"})
     public Ability sendLogo() {
         return Ability
                 .builder()
@@ -226,6 +233,7 @@ public class WorkshopBot extends AbilityBot {
         }
     }
 
+    @SuppressWarnings({"unused", "WeakerAccess"})
     public Ability sendIcon() {
         return Ability
                 .builder()
@@ -248,6 +256,7 @@ public class WorkshopBot extends AbilityBot {
         }
     }
 
+    @SuppressWarnings({"unused", "WeakerAccess"})
     public Ability sendKeyboard() {
         return Ability
                 .builder()
@@ -286,6 +295,7 @@ public class WorkshopBot extends AbilityBot {
                 .build();
     }
 
+    @SuppressWarnings({"unused", "WeakerAccess"})
     public Ability format() {
         return Ability
                 .builder()
@@ -301,6 +311,7 @@ public class WorkshopBot extends AbilityBot {
                 .build();
     }
 
+    @SuppressWarnings({"unused", "WeakerAccess"})
     public Ability add() {
         return Ability
                 .builder()
@@ -318,6 +329,7 @@ public class WorkshopBot extends AbilityBot {
                 .build();
     }
 
+    @SuppressWarnings({"unused", "WeakerAccess"})
     public Ability sayNo() {
         return Ability.builder()
                 .name(DEFAULT)

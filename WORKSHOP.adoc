@@ -208,6 +208,7 @@ If you do not know your Telegram ID, just start a chat to the `userinfobot`.
 Should be easy: Let's say hello. For creating an ability, we use the builder pattern:
 
 ```java
+@SuppressWarnings({"unused", "WeakerAccess"})
 public Ability sayHelloWorld() {
   return Ability
       .builder()
@@ -271,6 +272,7 @@ A reply is AbilityBot's swiss army knife. It comes in two variants and is able t
 Standalone replies do not need abilities. Lets add one to our bot:
 
 ```java
+@SuppressWarnings({"unused", "WeakerAccess"})
 public Reply replyToPhoto() {
   return Reply.of(
       update -> silent.send("Nice pic!", getChatId(update)),
@@ -287,6 +289,7 @@ Wow, that was easy! How easy would it be to implement a `VoxxedDaysBucharestBot`
 In exactly the same manner, you are able to attach replies to abilities. This way you can localize replies that relate to the same ability.
 
 ```java
+@SuppressWarnings({"unused", "WeakerAccess"})
 public Ability sayHi() {
   return Ability
     .builder()
@@ -323,6 +326,7 @@ If you use the ability bot, you have an integrated database. To persist the data
 Let's use it to implement a simple counter:
 
 ```java
+@SuppressWarnings({"unused", "WeakerAccess"})
 public Ability counter() {
   return Ability.builder()
       .name("count")
@@ -349,6 +353,7 @@ As you can see, the interface to the database is just a simple map. Cool, we can
 The ability bot automatically stores basic user information of every user, who contacted your bot. So we have some kind of an automatically contact list. We can access this list very easy:
 
 ```java
+@SuppressWarnings({"unused", "WeakerAccess"})
 public Ability contacts() {
   return Ability.builder()
       .name("contacts")
@@ -374,6 +379,7 @@ The process of receiving a photo is not very intuitive. Maybe it will be improve
 From Telegram we do not get the photo directly. Instead, we get a list of `PhotoSize` objects. A list? Yeas, the photo will be available in different sizes. If the sender sends a photo from his mobile device, it will be displayed in the chat history as a thumbnail. That's why one photo will end up in a list of `PhotoSize` objects. In our case, we want the original photo in the original size, so we sort that list by size and take the biggest one.
 
 ```java
+@SuppressWarnings({"unused", "WeakerAccess"})
 public Reply savePhoto() {
   return Reply.of(
       update -> {
@@ -429,6 +435,7 @@ private File downloadPhoto(final String filePath) {
 With these two helper methods we can now finish our `savePhoto` method:
 
 ```java
+@SuppressWarnings({"unused", "WeakerAccess"})
 public Reply savePhoto() {
   return Reply.of(
       update -> {
@@ -465,6 +472,7 @@ Compared to receiving a photo it is very easy to send a photo. There are three w
 In this example we implement a `/logo` command which will, difficult to guess, send a logo:
 
 ```java
+@SuppressWarnings({"unused", "WeakerAccess"})
 public Ability sendLogo() {
   return Ability
       .builder()
@@ -510,6 +518,7 @@ private void sendPhotoFromFileId(final String fileId, final Long chatId) {
 Here you can see the modified `savePhoto` method, we just added one line:
 
 ```java
+@SuppressWarnings({"unused", "WeakerAccess"})
 public Reply savePhoto() {
   return Reply.of(
       update -> {
@@ -536,6 +545,7 @@ public Reply savePhoto() {
 This is so easy, you just need to specify a `File` object! The photo will be uploaded to Telegram and send to the user:
 
 ```java
+@SuppressWarnings({"unused", "WeakerAccess"})
 public Ability sendIcon() {
   return Ability
       .builder()
@@ -573,6 +583,7 @@ In the following example we create a custom keyboard with two rows and three but
 In our example we want to provide buttons for the actions of our bot so we use the command as button text:
 
 ```java
+@SuppressWarnings({"unused", "WeakerAccess"})
 public Ability sendKeyboard() {
   return Ability
       .builder()
@@ -617,6 +628,7 @@ public Ability sendKeyboard() {
 To send formatted messages, you can use Markdown syntax. As of today, Telegram supports only a small subset of markdown. To activate Markdown support for a message, use `sendMd(…)` instead of just `send(…)`.
 
 ```java
+@SuppressWarnings({"unused", "WeakerAccess"})
 public Ability format() {
   return Ability
       .builder()
@@ -638,6 +650,7 @@ public Ability format() {
 Commands can have arguments. Usually arguments are separated by whitespace. You can, of course, get the message and parse the arguments yourself. But with the ability bot you can easily access the arguments:
 
 ```java
+@SuppressWarnings({"unused", "WeakerAccess"})
 public Ability add() {
   return Ability
       .builder()
@@ -663,6 +676,7 @@ To automatically create error messages if the use has not specified the correct 
 You can answer to non-command messages, too. That's what default abilities are for. Just specify an ability with the `DEFAULT` constant as command:
 
 ```java
+@SuppressWarnings({"unused", "WeakerAccess"})
 public Ability sayNo() {
   return Ability.builder()
       .name(DEFAULT)
