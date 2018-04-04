@@ -691,9 +691,10 @@ public Ability sayNo() {
 
 === Dependencies
 
-Better late than never – let's talk about testing. For testing our bot we need the help of a mocking library. Please add the following dependency to your project:
+Better late than never – let's talk about testing. For testing our bot we need the help of a mocking library. Please add the following dependencies to your project:
 
 ```groovy
+testCompile group: 'junit', name: 'junit', version: '4.12'
 testCompile group: 'org.mockito', name: 'mockito-core', version: '2.16.0'
 ```
 
