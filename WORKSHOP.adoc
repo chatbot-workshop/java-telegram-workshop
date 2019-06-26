@@ -10,8 +10,6 @@ Copyright (c) 2018 https://www.fihlon.ch/[Marcus Fihlon]
 - You need your own Telegram account
 - You need Telegram installed on your mobile or desktop
 
-WARNING: As of today, **Java 9+ is not supported** for this workshop. We use the https://github.com/rubenlagus/TelegramBots[Telegram Java API], which has a dependency to https://github.com/jankotek/mapdb[mapDB], which is not compatible to Java 9+ due to the use of undocumented internal SUN Java API.
-
 == Register
 
 Use Telegram to talk to the `BotFather` to register a new bot. Write down your bot username and your bot token.
@@ -40,7 +38,7 @@ On Windows, you may have to replace `/` by `\`.
 To use the Telegram Bot API, please add the following dependency:
 
 ```groovy
-compile group: 'org.telegram', name: 'telegrambots', version: '3.6'
+compile group: 'org.telegram', name: 'telegrambots', version: '4.3.1'
 ```
 
 === Create a bot class
@@ -151,7 +149,7 @@ _Congratulations!_
 To use the Telegram Bot Ability API, please add the following dependency:
 
 ```groovy
-compile group: 'org.telegram', name: 'telegrambots-abilities', version: '3.6'
+compile group: 'org.telegram', name: 'telegrambots-abilities', version: '4.3.1'
 ```
 
 === Create a bot class
@@ -195,9 +193,11 @@ public class WorkshopBot extends AbilityBot {
 AbilityBot forces a single implementation of creator ID. This ID corresponds to you, the bot developer. The bot needs to know its master since it has sensitive commands that only the master can use. So, if your Telegram ID Is 123456789, then add the following method:
 
 ```java
+private static int CREATOR_ID = 1234567890;
+
 @Override
 public int creatorId() {
-  return 123456789;
+  return CREATOR_ID;
 }
 ```
 
@@ -298,7 +298,7 @@ public Ability sayHi() {
     .locality(ALL)
     .privacy(PUBLIC)
     .action(context -> {
-      final String firstName = context.user().firstName();
+      final String firstName = context.user().getFirstName();
       silent.send("Hi, " + firstName, context.chatId());
     })
     .reply(
@@ -335,11 +335,11 @@ public Ability counter() {
       .locality(ALL)
       .action(context -> {
         final Map<String, Integer> counterMap = db.getMap("COUNTERS");
-        final int userId = context.user().id();
+        final int userId = context.user().getId();
         final Integer counter = counterMap.compute(
             String.valueOf(userId), (id, count) -> count == null ? 1 : ++count);
         final String message = String.format("%s, your count is now %d!",
-            context.user().shortName(), counter);
+            context.user().getUserName(), counter);
         silent.send(message, context.chatId());
       })
       .build();
@@ -361,8 +361,8 @@ public Ability contacts() {
       .privacy(PUBLIC)
       .locality(ALL)
       .action(context -> {
-        final Map<String, EndUser> usersMap = db.getMap("USERS");
-        final String users = usersMap.values().stream().map(EndUser::username).collect(joining(", "));
+        final Map<String, User> usersMap = db.getMap("USERS");
+        final String users = usersMap.values().stream().map(User::getUserName).collect(joining(", "));
         final String message = "The following users already contacted me: " + users;
         silent.send(message, context.chatId());
       })
@@ -408,7 +408,7 @@ private String getFilePath(final PhotoSize photo) {
   final GetFile getFileMethod = new GetFile();
   getFileMethod.setFileId(photo.getFileId());
   try {
-    final org.telegram.telegrambots.api.objects.File file = execute(getFileMethod);
+    final org.telegram.telegrambots.meta.api.objects.File file = execute(getFileMethod);
     return file.getFilePath();
   } catch (final TelegramApiException e) {
     e.printStackTrace();
@@ -480,7 +480,7 @@ public Ability sendLogo() {
       .info("send the logo")
       .locality(ALL)
       .privacy(PUBLIC)
-      .action(context -> sendPhotoFromUrl("https://www.fihlon.ch/images/logo.png", context.chatId()))
+      .action(context -> sendPhotoFromUrl("https://avatars3.githubusercontent.com/u/13538066?s=200&v=4", context.chatId()))
       .build();
 }
 
@@ -489,7 +489,7 @@ private void sendPhotoFromUrl(final String url, final Long chatId) {
   sendPhotoRequest.setChatId(chatId);                 // 2
   sendPhotoRequest.setPhoto(url);                     // 3
   try {
-    sendPhoto(sendPhotoRequest);                      // 4
+    execute(sendPhotoRequest);                        // 4
   } catch (final TelegramApiException e) {
     e.printStackTrace();
   }
@@ -508,7 +508,7 @@ private void sendPhotoFromFileId(final String fileId, final Long chatId) {
   sendPhotoRequest.setChatId(chatId);                 // 2
   sendPhotoRequest.setPhoto(fileId);                  // 3
   try {
-    sendPhoto(sendPhotoRequest);                      // 4
+    execute(sendPhotoRequest);                        // 4
   } catch (final TelegramApiException e) {
     e.printStackTrace();
   }
@@ -560,9 +560,9 @@ public Ability sendIcon() {
 private void sendPhotoFromUpload(final String filePath, final Long chatId) {
   final SendPhoto sendPhotoRequest = new SendPhoto(); // 1
   sendPhotoRequest.setChatId(chatId);                 // 2
-  sendPhotoRequest.setNewPhoto(new File(filePath));   // 3
+  sendPhotoRequest.setPhoto(new File(filePath));      // 3
   try {
-    sendPhoto(sendPhotoRequest);                      // 4
+    execute(sendPhotoRequest);                        // 4
   } catch (final TelegramApiException e) {
     e.printStackTrace();
   }
@@ -695,7 +695,7 @@ Better late than never – let's talk about testing. For testing our bot we need
 
 ```groovy
 testCompile group: 'junit', name: 'junit', version: '4.12'
-testCompile group: 'org.mockito', name: 'mockito-core', version: '2.16.0'
+testCompile group: 'org.mockito', name: 'mockito-core', version: '2.28.2'
 ```
 
 === Prepare your Bot
@@ -767,8 +767,8 @@ private static final long CHAT_ID = 12345L;
 @Test
 public void sayHelloWorld() throws TelegramApiException {
   final Update mockedUpdate = mock(Update.class);
-  final EndUser endUser = EndUser.endUser(USER_ID, "Foo", "Bar", "foobar42");
-  final MessageContext context = MessageContext.newContext(mockedUpdate, endUser, CHAT_ID);
+  final User user = new User(USER_ID, "Foo", false, "Bar", "foobar42", "en");
+  final MessageContext context = MessageContext.newContext(mockedUpdate, user, CHAT_ID);
 
   bot.sayHelloWorld().action().accept(context);
 

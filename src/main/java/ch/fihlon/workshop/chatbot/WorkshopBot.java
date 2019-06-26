@@ -23,22 +23,22 @@ import org.telegram.abilitybots.api.bot.AbilityBot;
 import org.telegram.abilitybots.api.db.DBContext;
 import org.telegram.abilitybots.api.db.MapDBContext;
 import org.telegram.abilitybots.api.objects.Ability;
-import org.telegram.abilitybots.api.objects.EndUser;
 import org.telegram.abilitybots.api.objects.Flag;
 import org.telegram.abilitybots.api.objects.Reply;
 import org.telegram.abilitybots.api.sender.MessageSender;
 import org.telegram.abilitybots.api.sender.SilentSender;
 import org.telegram.telegrambots.ApiContextInitializer;
-import org.telegram.telegrambots.TelegramBotsApi;
-import org.telegram.telegrambots.api.methods.GetFile;
-import org.telegram.telegrambots.api.methods.send.SendMessage;
-import org.telegram.telegrambots.api.methods.send.SendPhoto;
-import org.telegram.telegrambots.api.objects.PhotoSize;
-import org.telegram.telegrambots.api.objects.Update;
-import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardRow;
-import org.telegram.telegrambots.exceptions.TelegramApiException;
-import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.api.methods.GetFile;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.objects.PhotoSize;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -57,6 +57,7 @@ public class WorkshopBot extends AbilityBot {
 
     private static String BOT_TOKEN = "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static String BOT_USERNAME = "MyWorkshopBot";
+    private static int CREATOR_ID = 1234567890;
 
     public static void main(String[] args) throws TelegramApiRequestException {
         ApiContextInitializer.init();
@@ -72,7 +73,7 @@ public class WorkshopBot extends AbilityBot {
 
     @Override
     public int creatorId() {
-        return 1234567890;
+        return CREATOR_ID;
     }
 
     @SuppressWarnings({"unused", "WeakerAccess"})
@@ -103,7 +104,7 @@ public class WorkshopBot extends AbilityBot {
                 .locality(ALL)
                 .privacy(PUBLIC)
                 .action(context -> {
-                    final String firstName = context.user().firstName();
+                    final String firstName = context.user().getFirstName();
                     silent.send("Hi, " + firstName, context.chatId());
                 })
                 .reply(
@@ -128,11 +129,11 @@ public class WorkshopBot extends AbilityBot {
                 .locality(ALL)
                 .action(context -> {
                     final Map<String, Integer> counterMap = db.getMap("COUNTERS");
-                    final int userId = context.user().id();
+                    final int userId = context.user().getId();
                     final Integer counter = counterMap.compute(
                             String.valueOf(userId), (id, count) -> count == null ? 1 : ++count);
                     final String message = String.format("%s, your count is now %d!",
-                            context.user().shortName(), counter);
+                            context.user().getUserName(), counter);
                     silent.send(message, context.chatId());
                 })
                 .build();
@@ -146,8 +147,8 @@ public class WorkshopBot extends AbilityBot {
                 .privacy(PUBLIC)
                 .locality(ALL)
                 .action(context -> {
-                    final Map<String, EndUser> usersMap = db.getMap("USERS");
-                    final String users = usersMap.values().stream().map(EndUser::username).collect(joining(", "));
+                    final Map<String, User> usersMap = db.getMap("USERS");
+                    final String users = usersMap.values().stream().map(User::getUserName).collect(joining(", "));
                     final String message = "The following users already contacted me: " + users;
                     silent.send(message, context.chatId());
                 })
@@ -182,7 +183,7 @@ public class WorkshopBot extends AbilityBot {
         final GetFile getFileMethod = new GetFile();
         getFileMethod.setFileId(photo.getFileId());
         try {
-            final org.telegram.telegrambots.api.objects.File file = execute(getFileMethod);
+            final org.telegram.telegrambots.meta.api.objects.File file = execute(getFileMethod);
             return file.getFilePath();
         } catch (final TelegramApiException e) {
             e.printStackTrace();
@@ -207,7 +208,7 @@ public class WorkshopBot extends AbilityBot {
                 .info("send the logo")
                 .locality(ALL)
                 .privacy(PUBLIC)
-                .action(context -> sendPhotoFromUrl("https://www.fihlon.ch/images/logo.png", context.chatId()))
+                .action(context -> sendPhotoFromUrl("https://avatars3.githubusercontent.com/u/13538066?s=200&v=4", context.chatId()))
                 .build();
     }
 
@@ -216,7 +217,7 @@ public class WorkshopBot extends AbilityBot {
         sendPhotoRequest.setChatId(chatId);                 // 2
         sendPhotoRequest.setPhoto(url);                     // 3
         try {
-            sendPhoto(sendPhotoRequest);                    // 4
+            execute(sendPhotoRequest);                      // 4
         } catch (final TelegramApiException e) {
             e.printStackTrace();
         }
@@ -227,7 +228,7 @@ public class WorkshopBot extends AbilityBot {
         sendPhotoRequest.setChatId(chatId);                 // 2
         sendPhotoRequest.setPhoto(fileId);                  // 3
         try {
-            sendPhoto(sendPhotoRequest);                    // 4
+            execute(sendPhotoRequest);                      // 4
         } catch (final TelegramApiException e) {
             e.printStackTrace();
         }
@@ -248,9 +249,9 @@ public class WorkshopBot extends AbilityBot {
     private void sendPhotoFromUpload(final String filePath, final Long chatId) {
         final SendPhoto sendPhotoRequest = new SendPhoto(); // 1
         sendPhotoRequest.setChatId(chatId);                 // 2
-        sendPhotoRequest.setNewPhoto(new File(filePath));   // 3
+        sendPhotoRequest.setPhoto(new File(filePath));      // 3
         try {
-            sendPhoto(sendPhotoRequest);                    // 4
+            execute(sendPhotoRequest);                      // 4
         } catch (final TelegramApiException e) {
             e.printStackTrace();
         }

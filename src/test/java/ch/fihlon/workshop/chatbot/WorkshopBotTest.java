@@ -23,13 +23,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.telegram.abilitybots.api.db.DBContext;
 import org.telegram.abilitybots.api.db.MapDBContext;
-import org.telegram.abilitybots.api.objects.EndUser;
 import org.telegram.abilitybots.api.objects.MessageContext;
 import org.telegram.abilitybots.api.sender.MessageSender;
 import org.telegram.abilitybots.api.sender.SilentSender;
-import org.telegram.telegrambots.api.methods.send.SendMessage;
-import org.telegram.telegrambots.api.objects.Update;
-import org.telegram.telegrambots.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import static org.mockito.Mockito.*;
 
@@ -55,8 +55,8 @@ public class WorkshopBotTest {
     @Test
     public void sayHelloWorld() throws TelegramApiException {
         final Update mockedUpdate = mock(Update.class);
-        final EndUser endUser = EndUser.endUser(USER_ID, "Foo", "Bar", "foobar42");
-        final MessageContext context = MessageContext.newContext(mockedUpdate, endUser, CHAT_ID);
+        final User user = new User(USER_ID, "Foo", false, "Bar", "foobar42", "en");
+        final MessageContext context = MessageContext.newContext(mockedUpdate, user, CHAT_ID);
 
         bot.sayHelloWorld().action().accept(context);
 
