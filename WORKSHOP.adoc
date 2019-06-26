@@ -498,7 +498,7 @@ private void sendPhotoFromUrl(final String url, final Long chatId) {
 
 ==== Send Photo from File ID
 
-This is especially useful, if your bot receives a photo and wants to forward ist. The file id is on the `PhotoSize` object and the bot does not need to download the photo before it forwards (sends) the photo another user.
+This is especially useful, if your bot receives a photo and wants to forward it. The file id is on the `PhotoSize` object and the bot does not need to download the photo before it forwards (sends) the photo another user.
 
 To test this, we extend our previously written `savePhoto` method that it sends the received photo back to the sender by using the file id of the photo. First, the implementation of the `sendPhotoFromFileId`:
 
