@@ -1,0 +1,25 @@
+{
+  "extends": [
+    "config:base",
+    ":disableDependencyDashboard"
+  ],
+  "assignees": [
+    "McPringle"
+  ],
+  "reviewers": [
+    "McPringle"
+  ],
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true,
+      "commitMessagePrefix" : "⬆️ "
+    },
+    {
+      "matchDepTypes": ["devDependencies"],
+      "automerge": true,
+      "commitMessagePrefix" : "⬆️ "
+    }
+  ],
+  "platformAutomerge": true
+}
