@@ -22,8 +22,8 @@ version '1.0-SNAPSHOT'
 apply plugin: 'java'
 apply plugin: 'application'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 mainClassName = 'ch.fihlon.workshop.chatbot.WorkshopBot'
 
@@ -40,4 +40,9 @@ dependencies {
 
 tasks.named('wrapper') {
     distributionType = Wrapper.DistributionType.ALL
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+    options.compilerArgs += ["-Xlint:deprecation", "-Xlint:unchecked"]
 }
