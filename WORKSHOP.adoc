@@ -18,16 +18,18 @@ Use Telegram to talk to the `BotFather` to register a new bot. Write down your b
 
 For this workshop we use gradle. Please create a new gradle project using your IDE. I highly recommend to use the gradle application plugin to easily start you bot from the command line:
 
-```groovy
+[source,groovy]
+----
 apply plugin: 'application'
 mainClassName = 'ch.fihlon.workshop.chatbot.WorkshopBot'
-```
+----
 
 Of course, you may have to modify the `mainClassName` according your package structure and bot name. To run your bot (while you follow this workshop), just run the following command on your commandline:
 
-```bash
+[source,bash]
+----
 ./gradlew run
-```
+----
 
 On Windows, you may have to replace `/` by `\`.
 
@@ -37,15 +39,17 @@ On Windows, you may have to replace `/` by `\`.
 
 To use the Telegram Bot API, please add the following dependency:
 
-```groovy
+[source,groovy]
+----
 compile group: 'org.telegram', name: 'telegrambots', version: '4.3.1'
-```
+----
 
 === Create a bot class
 
 Create a class `GettingStartedBot` that extends `TelegramLongPollingBot` and add empty methods to satisfy the class contract:
 
-```java
+[source,java]
+----
 public class GettingStartedBot extends TelegramLongPollingBot {
 
   @Override
@@ -63,35 +67,38 @@ public class GettingStartedBot extends TelegramLongPollingBot {
   }
 
 }
-```
+----
 
 === Bot username
 
 The first method must return the username of your bot you wrote down while you registered your bot:
 
-```java
+[source,java]
+----
 @Override
 public String getBotUsername() {
   return "MyWorkshopBot";
 }
-```
+----
 
 === Bot token
 
 As you might imagine, the second method has to return the token of your bot. The token is needed for identification, like a password, so keep it private and *do not* commit it to any registry:
 
-```java
+[source,java]
+----
 @Override
 public String getBotToken() {
   return "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 }
-```
+----
 
 === React on a message
 
 In the third method you write your code which will be executed when your bot receives a message. For our first example we will just send the same message back to the sender:
 
-```java
+[source,java]
+----
 @Override
 public void onUpdateReceived(final Update update) {
   if (update.hasMessage() && update.getMessage().hasText()) {
@@ -107,7 +114,7 @@ public void onUpdateReceived(final Update update) {
     }
   }
 }
-```
+----
 
 This example should be quite easy to understand. First, we check if we have a message and it is a text message. Then we extract two values:
 
@@ -125,14 +132,15 @@ For our simple example, we just a good old `main` method. The start needs four s
 . We need an instance of our bot
 . We need to register our bot instance at Telegram
 
-```java
+[source,java]
+----
 public static void main(final String[] args) throws TelegramApiRequestException {
   ApiContextInitializer.init();                          // 1
   final TelegramBotsApi api = new TelegramBotsApi();     // 2
   final GettingStartedBot bot = new GettingStartedBot(); // 3
   api.registerBot(bot);                                  // 4
 }
-```
+----
 
 === Play with your bot
 
@@ -148,15 +156,17 @@ _Congratulations!_
 
 To use the Telegram Bot Ability API, please add the following dependency:
 
-```groovy
+[source,groovy]
+----
 compile group: 'org.telegram', name: 'telegrambots-abilities', version: '4.3.1'
-```
+----
 
 === Create a bot class
 
 Create a class `WorkshopBot` that extends `AbilityBot` and add a no argument constructor and empty methods to satisfy the class contract:
 
-```java
+[source,java]
+----
 public class WorkshopBot extends AbilityBot {
 
   WorkshopBot() {
@@ -168,13 +178,14 @@ public class WorkshopBot extends AbilityBot {
     return 0;
   }
 }
-```
+----
 
 === Bot token and username
 
 The easy part: Add the token and username of your bot as constants to your class and specify them in the super constructor call:
 
-```java
+[source,java]
+----
 public class WorkshopBot extends AbilityBot {
 
   private static String BOT_TOKEN = "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -186,20 +197,21 @@ public class WorkshopBot extends AbilityBot {
 
   …
 }
-```
+----
 
 === Your Telegram ID
 
 AbilityBot forces a single implementation of creator ID. This ID corresponds to you, the bot developer. The bot needs to know its master since it has sensitive commands that only the master can use. So, if your Telegram ID Is 123456789, then add the following method:
 
-```java
+[source,java]
+----
 private static int CREATOR_ID = 1234567890;
 
 @Override
 public int creatorId() {
   return CREATOR_ID;
 }
-```
+----
 
 If you do not know your Telegram ID, just start a chat to the `userinfobot`.
 
@@ -207,7 +219,8 @@ If you do not know your Telegram ID, just start a chat to the `userinfobot`.
 
 Should be easy: Let's say hello. For creating an ability, we use the builder pattern:
 
-```java
+[source,java]
+----
 @SuppressWarnings({"unused", "WeakerAccess"})
 public Ability sayHelloWorld() {
   return Ability
@@ -219,7 +232,7 @@ public Ability sayHelloWorld() {
       .action(context -> silent.send("Hello world!", context.chatId())) // 5
       .build();
 }
-```
+----
 
 . the name of the command
 . a description of the command
@@ -236,14 +249,15 @@ To start the ability bot we need to do exactly the same as with the bot, we crea
 . We need an instance of our bot
 . We need to register our bot instance at Telegram
 
-```java
+[source,java]
+----
 public static void main(final String[] args) throws TelegramApiRequestException {
   ApiContextInitializer.init();                      // 1
   final TelegramBotsApi api = new TelegramBotsApi(); // 2
   final WorkshopBot bot = new WorkshopBot();         // 3
   api.registerBot(bot);                              // 4
 }
-```
+----
 
 === Play with your bot
 
@@ -271,14 +285,15 @@ A reply is AbilityBot's swiss army knife. It comes in two variants and is able t
 
 Standalone replies do not need abilities. Lets add one to our bot:
 
-```java
+[source,java]
+----
 @SuppressWarnings({"unused", "WeakerAccess"})
 public Reply replyToPhoto() {
   return Reply.of(
       update -> silent.send("Nice pic!", getChatId(update)),
       Flag.PHOTO);
 }
-```
+----
 
 As you can see, you just provide a lambda function which consumes the update. In addition to the required lambda function, replies can have optional predicates. In our example we let the bot know, that we only want to reply to images. Take a look at the `Flag` enum.
 
@@ -288,7 +303,8 @@ Wow, that was easy! How easy would it be to implement a `VoxxedDaysBucharestBot`
 
 In exactly the same manner, you are able to attach replies to abilities. This way you can localize replies that relate to the same ability.
 
-```java
+[source,java]
+----
 @SuppressWarnings({"unused", "WeakerAccess"})
 public Ability sayHi() {
   return Ability
@@ -313,7 +329,7 @@ public Ability sayHi() {
 private Predicate<Update> isMarcus() {
   return update -> update.getMessage().getFrom().getFirstName().equalsIgnoreCase("Marcus");
 }
-```
+----
 
 In this example you can see how easy it is to create and use your own predicates. Using predicates, you can implement all checks, so your logic keeps clean and can focus on action.
 
@@ -325,7 +341,8 @@ If you use the ability bot, you have an integrated database. To persist the data
 
 Let's use it to implement a simple counter:
 
-```java
+[source,java]
+----
 @SuppressWarnings({"unused", "WeakerAccess"})
 public Ability counter() {
   return Ability.builder()
@@ -344,7 +361,7 @@ public Ability counter() {
       })
       .build();
 }
-```
+----
 
 As you can see, the interface to the database is just a simple map. Cool, we can now implement actions that need persistence.
 
@@ -352,7 +369,8 @@ As you can see, the interface to the database is just a simple map. Cool, we can
 
 The ability bot automatically stores basic user information of every user, who contacted your bot. So we have some kind of an automatically contact list. We can access this list very easy:
 
-```java
+[source,java]
+----
 @SuppressWarnings({"unused", "WeakerAccess"})
 public Ability contacts() {
   return Ability.builder()
@@ -368,7 +386,7 @@ public Ability contacts() {
       })
       .build();
 }
-```
+----
 
 == Photos
 
@@ -378,7 +396,8 @@ The process of receiving a photo is not very intuitive. Maybe it will be improve
 
 From Telegram we do not get the photo directly. Instead, we get a list of `PhotoSize` objects. A list? Yeas, the photo will be available in different sizes. If the sender sends a photo from his mobile device, it will be displayed in the chat history as a thumbnail. That's why one photo will end up in a list of `PhotoSize` objects. In our case, we want the original photo in the original size, so we sort that list by size and take the biggest one.
 
-```java
+[source,java]
+----
 @SuppressWarnings({"unused", "WeakerAccess"})
 public Reply savePhoto() {
   return Reply.of(
@@ -396,11 +415,12 @@ public Reply savePhoto() {
       },
       Flag.PHOTO);
   }
-```
+----
 
 So far, so good. but there is still no photo, just a `PhotoSize` object. We have to actively download the photo in that size, we want, to reduce network traffic and server load. But to download a photo, we first need to get the file path of the photo. Sometimes photos already have a file path, sometimes not – then we have to ask Telegram for it. This is how we do that:
 
-```java
+[source,java]
+----
 private String getFilePath(final PhotoSize photo) {
   if (photo.hasFilePath()) {
     return photo.getFilePath();
@@ -415,13 +435,14 @@ private String getFilePath(final PhotoSize photo) {
   }
   return null;
 }
-```
+----
 
 Be careful to use the correct `File` object!
 
 Using the file path we are now able to download the photo from Telegram. Luckily, this task is very easy:
 
-```java
+[source,java]
+----
 private File downloadPhoto(final String filePath) {
   try {
     return downloadFile(filePath);
@@ -430,11 +451,12 @@ private File downloadPhoto(final String filePath) {
   }
   return null;
 }
-```
+----
 
 With these two helper methods we can now finish our `savePhoto` method:
 
-```java
+[source,java]
+----
 @SuppressWarnings({"unused", "WeakerAccess"})
 public Reply savePhoto() {
   return Reply.of(
@@ -454,7 +476,7 @@ public Reply savePhoto() {
       },
       Flag.PHOTO);
 }
-```
+----
 
 Uff, done! Try it and send a photo to your bot! On the console you can see the temporary file on the bot host. Now you can easily continue and move it everywhere you like or implement some filter magic and send the photo back to the user.
 
@@ -471,7 +493,8 @@ Compared to receiving a photo it is very easy to send a photo. There are three w
 
 In this example we implement a `/logo` command which will, difficult to guess, send a logo:
 
-```java
+[source,java]
+----
 @SuppressWarnings({"unused", "WeakerAccess"})
 public Ability sendLogo() {
   return Ability
@@ -494,7 +517,7 @@ private void sendPhotoFromUrl(final String url, final Long chatId) {
     e.printStackTrace();
   }
 }
-```
+----
 
 ==== Send Photo from File ID
 
@@ -502,7 +525,8 @@ This is especially useful, if your bot receives a photo and wants to forward it.
 
 To test this, we extend our previously written `savePhoto` method that it sends the received photo back to the sender by using the file id of the photo. First, the implementation of the `sendPhotoFromFileId`:
 
-```java
+[source,java]
+----
 private void sendPhotoFromFileId(final String fileId, final Long chatId) {
   final SendPhoto sendPhotoRequest = new SendPhoto(); // 1
   sendPhotoRequest.setChatId(chatId);                 // 2
@@ -513,11 +537,12 @@ private void sendPhotoFromFileId(final String fileId, final Long chatId) {
     e.printStackTrace();
   }
 }
-```
+----
 
 Here you can see the modified `savePhoto` method, we just added one line:
 
-```java
+[source,java]
+----
 @SuppressWarnings({"unused", "WeakerAccess"})
 public Reply savePhoto() {
   return Reply.of(
@@ -538,13 +563,14 @@ public Reply savePhoto() {
       },
       Flag.PHOTO);
 }
-```
+----
 
 ==== Upload and send a Photo
 
 This is so easy, you just need to specify a `File` object! The photo will be uploaded to Telegram and send to the user:
 
-```java
+[source,java]
+----
 @SuppressWarnings({"unused", "WeakerAccess"})
 public Ability sendIcon() {
   return Ability
@@ -567,7 +593,7 @@ private void sendPhotoFromUpload(final String filePath, final Long chatId) {
     e.printStackTrace();
   }
 }
-```
+----
 
 == Custom Keyboard (Buttons)
 
@@ -582,7 +608,8 @@ In the following example we create a custom keyboard with two rows and three but
 
 In our example we want to provide buttons for the actions of our bot so we use the command as button text:
 
-```java
+[source,java]
+----
 @SuppressWarnings({"unused", "WeakerAccess"})
 public Ability sendKeyboard() {
   return Ability
@@ -621,13 +648,14 @@ public Ability sendKeyboard() {
       })
       .build();
 }
-```
+----
 
 == Formatted Messages
 
 To send formatted messages, you can use Markdown syntax. As of today, Telegram supports only a small subset of markdown. To activate Markdown support for a message, use `sendMd(…)` instead of just `send(…)`.
 
-```java
+[source,java]
+----
 @SuppressWarnings({"unused", "WeakerAccess"})
 public Ability format() {
   return Ability
@@ -643,13 +671,14 @@ public Ability format() {
       })
       .build();
 }
-```
+----
 
 == Arguments
 
 Commands can have arguments. Usually arguments are separated by whitespace. You can, of course, get the message and parse the arguments yourself. But with the ability bot you can easily access the arguments:
 
-```java
+[source,java]
+----
 @SuppressWarnings({"unused", "WeakerAccess"})
 public Ability add() {
   return Ability
@@ -667,7 +696,7 @@ public Ability add() {
       })
       .build();
 }
-```
+----
 
 To automatically create error messages if the use has not specified the correct amount of arguments, you can configure the number of required arguments like in the example above: `.input(2)`
 
@@ -675,7 +704,8 @@ To automatically create error messages if the use has not specified the correct 
 
 You can answer to non-command messages, too. That's what default abilities are for. Just specify an ability with the `DEFAULT` constant as command:
 
-```java
+[source,java]
+----
 @SuppressWarnings({"unused", "WeakerAccess"})
 public Ability sayNo() {
   return Ability.builder()
@@ -685,7 +715,7 @@ public Ability sayNo() {
       .action(context -> silent.send("Sorry, I have no answer for you today.", context.chatId()))
       .build();
 }
-```
+----
 
 == Testing
 
@@ -693,25 +723,28 @@ public Ability sayNo() {
 
 Better late than never – let's talk about testing. For testing our bot we need the help of a mocking library. Please add the following dependencies to your project:
 
-```groovy
+[source,groovy]
+----
 testCompile group: 'junit', name: 'junit', version: '4.12'
 testCompile group: 'org.mockito', name: 'mockito-core', version: '2.28.2'
-```
+----
 
 === Prepare your Bot
 
 In some of our abilities we use a database connection. We need to add an additional constructor to be able to inject a database for the tests:
 
-```java
+[source,java]
+----
 @VisibleForTesting
 WorkshopBot(final DBContext db) {
   super(BOT_TOKEN, BOT_USERNAME, db);
 }
-```
+----
 
 To prevent that the live system of Telegram is used, we need to inject mocks for the `MessageSender` and `SilentSender`. To be able to do this, we add the following two methods to our bot:
 
-```java
+[source,java]
+----
 @VisibleForTesting
 void setSender(final MessageSender sender) {
   this.sender = sender;
@@ -721,7 +754,7 @@ void setSender(final MessageSender sender) {
 void setSilent(final SilentSender silent) {
   this.silent = silent;
 }
-```
+----
 
 === Prepare the Test
 
@@ -731,8 +764,8 @@ void setSilent(final SilentSender silent) {
 . We inject the sender into our bot.
 . We create and inject the silent object into our bot.
 
-
-```java
+[source,java]
+----
 public class WorkshopBotTest {
 
   private WorkshopBot bot;
@@ -754,13 +787,14 @@ public class WorkshopBotTest {
   }
 
 }
-```
+----
 
 === Simple Test
 
 First, we take a very simple test case: Our "Hello World" example. The test for this ability would be:
 
-```java
+[source,java]
+----
 private static final int USER_ID = 12345;
 private static final long CHAT_ID = 12345L;
 
@@ -777,7 +811,7 @@ public void sayHelloWorld() throws TelegramApiException {
   message.setText("Hello world!");
   verify(sender, times(1)).execute(message);
 }
-```
+----
 
 In the first code block we mock the `Update` class, which is used by the context object. Then we create an `EndUser` for our test case and create a new context object with all needed information.
 
