@@ -19,6 +19,12 @@
 package ch.fihlon.workshop.chatbot;
 
 import com.google.common.annotations.VisibleForTesting;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
 import org.telegram.abilitybots.api.bot.AbilityBot;
 import org.telegram.abilitybots.api.db.DBContext;
 import org.telegram.abilitybots.api.db.MapDBContext;
@@ -27,25 +33,18 @@ import org.telegram.abilitybots.api.objects.Flag;
 import org.telegram.abilitybots.api.objects.Reply;
 import org.telegram.abilitybots.api.sender.MessageSender;
 import org.telegram.abilitybots.api.sender.SilentSender;
-import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.GetFile;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 import static java.util.stream.Collectors.joining;
 import static org.telegram.abilitybots.api.objects.Flag.TEXT;
@@ -53,17 +52,17 @@ import static org.telegram.abilitybots.api.objects.Locality.ALL;
 import static org.telegram.abilitybots.api.objects.Privacy.PUBLIC;
 import static org.telegram.abilitybots.api.util.AbilityUtils.getChatId;
 
+@SuppressWarnings("SameParameterValue")
 public class WorkshopBot extends AbilityBot {
 
-    private static String BOT_TOKEN = "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    private static String BOT_USERNAME = "MyWorkshopBot";
-    private static int CREATOR_ID = 1234567890;
+    private static final String BOT_TOKEN = "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private static final String BOT_USERNAME = "MyWorkshopBot";
+    private static final long CREATOR_ID = 1234567890L;
 
-    public static void main(String[] args) throws TelegramApiRequestException {
-        ApiContextInitializer.init();
-        final DBContext db = MapDBContext.onlineInstance("bot.db");
-        final WorkshopBot bot = new WorkshopBot(db);
-        final TelegramBotsApi api = new TelegramBotsApi();
+    public static void main(String[] args) throws TelegramApiException {
+        final var db = MapDBContext.onlineInstance("bot.db");
+        final var bot = new WorkshopBot(db);
+        final var api = new TelegramBotsApi(DefaultBotSession.class);
         api.registerBot(bot);
     }
 
@@ -72,7 +71,7 @@ public class WorkshopBot extends AbilityBot {
     }
 
     @Override
-    public int creatorId() {
+    public long creatorId() {
         return CREATOR_ID;
     }
 
@@ -91,7 +90,7 @@ public class WorkshopBot extends AbilityBot {
     @SuppressWarnings({"unused", "WeakerAccess"})
     public Reply replyToPhoto() {
         return Reply.of(
-                update -> silent.send("Nice pic!", getChatId(update)),
+            (bot, update) -> silent.send("Nice pic!", getChatId(update)),
                 Flag.PHOTO);
     }
 
@@ -108,10 +107,10 @@ public class WorkshopBot extends AbilityBot {
                     silent.send("Hi, " + firstName, context.chatId());
                 })
                 .reply(
-                        update -> silent.send("Wow, nice name!", update.getMessage().getChatId()),
-                        TEXT,
-                        update -> update.getMessage().getText().startsWith("/hi"),
-                        isMarcus()
+                    (bot, update) -> silent.send("Wow, nice name!", update.getMessage().getChatId()),
+                    TEXT,
+                    update -> update.getMessage().getText().startsWith("/hi"),
+                    isMarcus()
                 )
                 .build();
     }
@@ -129,7 +128,7 @@ public class WorkshopBot extends AbilityBot {
                 .locality(ALL)
                 .action(context -> {
                     final Map<String, Integer> counterMap = db.getMap("COUNTERS");
-                    final int userId = context.user().getId();
+                    final long userId = context.user().getId();
                     final Integer counter = counterMap.compute(
                             String.valueOf(userId), (id, count) -> count == null ? 1 : ++count);
                     final String message = String.format("%s, your count is now %d!",
@@ -158,7 +157,7 @@ public class WorkshopBot extends AbilityBot {
     @SuppressWarnings({"unused", "WeakerAccess"})
     public Reply savePhoto() {
         return Reply.of(
-                update -> {
+            (bot, update) -> {
                     final List<PhotoSize> photos = update.getMessage().getPhoto();
                     final PhotoSize photoSize = photos.stream()
                             .max(Comparator.comparing(PhotoSize::getFileSize))
@@ -177,8 +176,9 @@ public class WorkshopBot extends AbilityBot {
     }
 
     private String getFilePath(final PhotoSize photo) {
-        if (photo.hasFilePath()) {
-            return photo.getFilePath();
+        final var filePath = photo.getFilePath();
+        if (filePath != null && !filePath.isBlank()) {
+            return filePath;
         }
         final GetFile getFileMethod = new GetFile();
         getFileMethod.setFileId(photo.getFileId());
@@ -208,14 +208,14 @@ public class WorkshopBot extends AbilityBot {
                 .info("send the logo")
                 .locality(ALL)
                 .privacy(PUBLIC)
-                .action(context -> sendPhotoFromUrl("https://avatars3.githubusercontent.com/u/13538066?s=200&v=4", context.chatId()))
+                .action(context -> sendPhotoFromUrl("https://avatars3.githubusercontent.com/u/13538066?s=200&v=5", context.chatId()))
                 .build();
     }
 
     private void sendPhotoFromUrl(final String url, final Long chatId) {
         final SendPhoto sendPhotoRequest = new SendPhoto(); // 1
-        sendPhotoRequest.setChatId(chatId);                 // 2
-        sendPhotoRequest.setPhoto(url);                     // 3
+        sendPhotoRequest.setChatId(String.valueOf(chatId)); // 2
+        sendPhotoRequest.setPhoto(new InputFile(url));      // 3
         try {
             execute(sendPhotoRequest);                      // 4
         } catch (final TelegramApiException e) {
@@ -225,8 +225,8 @@ public class WorkshopBot extends AbilityBot {
 
     private void sendPhotoFromFileId(final String fileId, final Long chatId) {
         final SendPhoto sendPhotoRequest = new SendPhoto(); // 1
-        sendPhotoRequest.setChatId(chatId);                 // 2
-        sendPhotoRequest.setPhoto(fileId);                  // 3
+        sendPhotoRequest.setChatId(String.valueOf(chatId)); // 2
+        sendPhotoRequest.setPhoto(new InputFile(fileId));   // 3
         try {
             execute(sendPhotoRequest);                      // 4
         } catch (final TelegramApiException e) {
@@ -247,11 +247,11 @@ public class WorkshopBot extends AbilityBot {
     }
 
     private void sendPhotoFromUpload(final String filePath, final Long chatId) {
-        final SendPhoto sendPhotoRequest = new SendPhoto(); // 1
-        sendPhotoRequest.setChatId(chatId);                 // 2
-        sendPhotoRequest.setPhoto(new File(filePath));      // 3
+        final SendPhoto sendPhotoRequest = new SendPhoto();           // 1
+        sendPhotoRequest.setChatId(String.valueOf(chatId));           // 2
+        sendPhotoRequest.setPhoto(new InputFile(new File(filePath))); // 3
         try {
-            execute(sendPhotoRequest);                      // 4
+            execute(sendPhotoRequest);                                // 4
         } catch (final TelegramApiException e) {
             e.printStackTrace();
         }
@@ -267,7 +267,7 @@ public class WorkshopBot extends AbilityBot {
                 .privacy(PUBLIC)
                 .action(context -> {
                     final SendMessage message = new SendMessage();
-                    message.setChatId(context.chatId());
+                    message.setChatId(String.valueOf(context.chatId()));
                     message.setText("Enjoy this wonderful keyboard!");
 
                     final ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();

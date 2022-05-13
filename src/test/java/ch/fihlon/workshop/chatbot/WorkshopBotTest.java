@@ -31,11 +31,13 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 public class WorkshopBotTest {
 
-    private static final int USER_ID = 1337;
+    private static final long USER_ID = 1337L;
     private static final long CHAT_ID = 1337L;
 
     private WorkshopBot bot;
@@ -55,13 +57,13 @@ public class WorkshopBotTest {
     @Test
     public void sayHelloWorld() throws TelegramApiException {
         final Update mockedUpdate = mock(Update.class);
-        final User user = new User(USER_ID, "Foo", false, "Bar", "foobar42", "en");
-        final MessageContext context = MessageContext.newContext(mockedUpdate, user, CHAT_ID);
+        final User user = new User(USER_ID, "Foo", false, "Bar", "foobar42", "en", false, false, false);
+        final MessageContext context = MessageContext.newContext(mockedUpdate, user, CHAT_ID, bot);
 
         bot.sayHelloWorld().action().accept(context);
 
         final SendMessage message = new SendMessage();
-        message.setChatId(CHAT_ID);
+        message.setChatId(String.valueOf(CHAT_ID));
         message.setText("Hello world");
         verify(sender, times(1)).execute(message);
     }

@@ -32,8 +32,8 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'org.telegram', name: 'telegrambots', version: '4.3.1'
-    implementation group: 'org.telegram', name: 'telegrambots-abilities', version: '4.3.1'
+    implementation group: 'org.telegram', name: 'telegrambots', version: '6.0.1'
+    implementation group: 'org.telegram', name: 'telegrambots-abilities', version: '6.0.1'
     testImplementation group: 'junit', name: 'junit', version: '4.12'
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '2.28.2'
 }
