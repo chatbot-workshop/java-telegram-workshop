@@ -1,10 +1,10 @@
 = Java & Telegram ChatBot Workshop
 
-Copyright (c) 2018 https://www.fihlon.ch/[Marcus Fihlon]
+Copyright (c) 2018-2022 https://www.fihlon.ch/[Marcus Fihlon]
 
 == Prerequesites
 
-- Java 8
+- Java 17
 - Java IDE
 - You should be familiar with your IDE
 - You need your own Telegram account
@@ -41,7 +41,7 @@ To use the Telegram Bot API, please add the following dependency:
 
 [source,groovy]
 ----
-compile group: 'org.telegram', name: 'telegrambots', version: '4.3.1'
+compile group: 'org.telegram', name: 'telegrambots', version: '6.0.1'
 ----
 
 === Create a bot class
@@ -52,19 +52,19 @@ Create a class `GettingStartedBot` that extends `TelegramLongPollingBot` and add
 ----
 public class GettingStartedBot extends TelegramLongPollingBot {
 
-  @Override
-  public String getBotUsername() {
-    return null;
-  }
+    @Override
+    public String getBotUsername() {
+        return null;
+    }
 
-  @Override
-  public String getBotToken() {
-    return null;
-  }
+    @Override
+    public String getBotToken() {
+        return null;
+    }
 
-  @Override
-  public void onUpdateReceived(final Update update) {
-  }
+    @Override
+    public void onUpdateReceived(final Update update) {
+    }
 
 }
 ----
@@ -77,7 +77,7 @@ The first method must return the username of your bot you wrote down while you r
 ----
 @Override
 public String getBotUsername() {
-  return "MyWorkshopBot";
+    return "MyWorkshopBot";
 }
 ----
 
@@ -89,7 +89,7 @@ As you might imagine, the second method has to return the token of your bot. The
 ----
 @Override
 public String getBotToken() {
-  return "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    return "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 }
 ----
 
@@ -101,18 +101,19 @@ In the third method you write your code which will be executed when your bot rec
 ----
 @Override
 public void onUpdateReceived(final Update update) {
-  if (update.hasMessage() && update.getMessage().hasText()) {
-    final Long chatId = update.getMessage().getChatId();
-    final String text = update.getMessage().getText();
-    final SendMessage message = new SendMessage()
-        .setChatId(chatId)
-        .setText(text);
-    try {
-      execute(message);
-    } catch (final TelegramApiException e) {
-      e.printStackTrace();
+    if (update.hasMessage() && update.getMessage().hasText()) {
+        final var message = update.getMessage();
+        final var chatId = message.getChatId();
+        final var text = message.getText();
+        final var answer = new SendMessage();
+        answer.setChatId(String.valueOf(chatId)); // Why String? Because it can be a username, too.
+        answer.setText(text);
+        try {
+            execute(answer);
+        } catch (final TelegramApiException e) {
+            e.printStackTrace();
+        }
     }
-  }
 }
 ----
 
@@ -121,24 +122,22 @@ This example should be quite easy to understand. First, we check if we have a me
 . The `chatId`, which identifies a chat. We need this id, to send the answer to the correct person. Every chat has a unique id. We could save this id for later use and reply at any time. But here, we reply immediately.
 . The text. This is just the text of the message, the bot received.
 
-To send an answer, we have to create a `SendMessage` method and set the `chatId` and the text, which should be send. Then we `excute` this method, which will send the message. Of course, there can happen a lot of errors (servers down, network failures etc), so have to do really good error handling like in the example above.
+To send an answer, we have to create a `SendMessage` method and set the `chatId` and the text, which should be send. Then we `execute` this method, which will send the message. Of course, there can happen a lot of errors (servers down, network failures etc), so have to do really good error handling like in the example above.
 
 === Start your bot
 
 For our simple example, we just a good old `main` method. The start needs four steps:
 
-. We need a Telegram API context
 . We need an instance of the Telegram API
 . We need an instance of our bot
 . We need to register our bot instance at Telegram
 
 [source,java]
 ----
-public static void main(final String[] args) throws TelegramApiRequestException {
-  ApiContextInitializer.init();                          // 1
-  final TelegramBotsApi api = new TelegramBotsApi();     // 2
-  final GettingStartedBot bot = new GettingStartedBot(); // 3
-  api.registerBot(bot);                                  // 4
+public static void main(final String[] args) throws TelegramApiException {
+    final var api = new TelegramBotsApi(DefaultBotSession.class);   // 1
+    final var bot = new GettingStartedBot();                        // 2
+    api.registerBot(bot);                                           // 3
 }
 ----
 
@@ -158,7 +157,7 @@ To use the Telegram Bot Ability API, please add the following dependency:
 
 [source,groovy]
 ----
-compile group: 'org.telegram', name: 'telegrambots-abilities', version: '4.3.1'
+compile group: 'org.telegram', name: 'telegrambots-abilities', version: '6.0.1'
 ----
 
 === Create a bot class
@@ -169,14 +168,15 @@ Create a class `WorkshopBot` that extends `AbilityBot` and add a no argument con
 ----
 public class WorkshopBot extends AbilityBot {
 
-  WorkshopBot() {
-    super(null, null);
-  }
+    WorkshopBot() {
+        super(null, null);
+    }
 
-  @Override
-  public int creatorId() {
-    return 0;
-  }
+    @Override
+    public long creatorId() {
+        return 0;
+    }
+
 }
 ----
 
@@ -188,28 +188,28 @@ The easy part: Add the token and username of your bot as constants to your class
 ----
 public class WorkshopBot extends AbilityBot {
 
-  private static String BOT_TOKEN = "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  private static String BOT_USERNAME = "MyWorkshopBot";
+    private static String BOT_TOKEN = "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private static String BOT_USERNAME = "MyWorkshopBot";
 
-  WorkshopBot() {
+    WorkshopBot() {
     super(BOT_TOKEN, BOT_USERNAME);
-  }
+    }
 
-  …
+    …
 }
 ----
 
 === Your Telegram ID
 
-AbilityBot forces a single implementation of creator ID. This ID corresponds to you, the bot developer. The bot needs to know its master since it has sensitive commands that only the master can use. So, if your Telegram ID Is 123456789, then add the following method:
+AbilityBot forces a single implementation of creator ID. This ID corresponds to you, the bot developer. The bot needs to know its master since it has sensitive commands that only the master can use. So, if your Telegram ID Is 1234567890, then add the following method:
 
 [source,java]
 ----
-private static int CREATOR_ID = 1234567890;
+private static long CREATOR_ID = 1234567890L;
 
 @Override
 public int creatorId() {
-  return CREATOR_ID;
+    return CREATOR_ID;
 }
 ----
 
@@ -223,14 +223,14 @@ Should be easy: Let's say hello. For creating an ability, we use the builder pat
 ----
 @SuppressWarnings({"unused", "WeakerAccess"})
 public Ability sayHelloWorld() {
-  return Ability
-      .builder()
-      .name("hello")                                                    // 1
-      .info("says hello world")                                         // 2
-      .locality(ALL)                                                    // 3
-      .privacy(PUBLIC)                                                  // 4
-      .action(context -> silent.send("Hello world!", context.chatId())) // 5
-      .build();
+    return Ability
+        .builder()
+        .name("hello")                                                    // 1
+        .info("says hello world")                                         // 2
+        .locality(ALL)                                                    // 3
+        .privacy(PUBLIC)                                                  // 4
+        .action(context -> silent.send("Hello world!", context.chatId())) // 5
+        .build();
 }
 ----
 
@@ -244,18 +244,16 @@ public Ability sayHelloWorld() {
 
 To start the ability bot we need to do exactly the same as with the bot, we created before:
 
-. We need a Telegram API context
 . We need an instance of the Telegram API
 . We need an instance of our bot
 . We need to register our bot instance at Telegram
 
 [source,java]
 ----
-public static void main(final String[] args) throws TelegramApiRequestException {
-  ApiContextInitializer.init();                      // 1
-  final TelegramBotsApi api = new TelegramBotsApi(); // 2
-  final WorkshopBot bot = new WorkshopBot();         // 3
-  api.registerBot(bot);                              // 4
+public static void main(final String[] args) throws TelegramApiException {
+    final TelegramBotsApi api = new TelegramBotsApi(DefaultBotSession.class);   // 1
+    final WorkshopBot bot = new WorkshopBot();                                  // 2
+    api.registerBot(bot);                                                       // 3
 }
 ----
 
@@ -283,21 +281,21 @@ A reply is AbilityBot's swiss army knife. It comes in two variants and is able t
 
 === Standalon Reply
 
-Standalone replies do not need abilities. Lets add one to our bot:
+Standalone replies do not need abilities. Let's add one to our bot:
 
 [source,java]
 ----
 @SuppressWarnings({"unused", "WeakerAccess"})
 public Reply replyToPhoto() {
-  return Reply.of(
-      update -> silent.send("Nice pic!", getChatId(update)),
-      Flag.PHOTO);
+    return Reply.of(
+        (bot, update) -> silent.send("Nice pic!", getChatId(update)),
+            Flag.PHOTO);
 }
 ----
 
 As you can see, you just provide a lambda function which consumes the update. In addition to the required lambda function, replies can have optional predicates. In our example we let the bot know, that we only want to reply to images. Take a look at the `Flag` enum.
 
-Wow, that was easy! How easy would it be to implement a `VoxxedDaysBucharestBot`, where you can send pictures which are automatically uploaded to a Google Drive (or similar) share? If you are a nerd and finish this workshop early, try to implement it…
+Wow, that was easy! How easy would it be to implement a `VoxxedDaysZurichBot`, where you can send pictures which are automatically uploaded to a Google Drive (or similar) share? If you are a nerd and finish this workshop early, try to implement it…
 
 === Ability Reply and own Predicates
 
@@ -307,27 +305,27 @@ In exactly the same manner, you are able to attach replies to abilities. This wa
 ----
 @SuppressWarnings({"unused", "WeakerAccess"})
 public Ability sayHi() {
-  return Ability
-    .builder()
-    .name("hi")
-    .info("says hi")
-    .locality(ALL)
-    .privacy(PUBLIC)
-    .action(context -> {
-      final String firstName = context.user().getFirstName();
-      silent.send("Hi, " + firstName, context.chatId());
-    })
-    .reply(
-        update -> silent.send("Wow, nice name!", update.getMessage().getChatId()),
-        TEXT,
-        update -> update.getMessage().getText().startsWith("/hi"),
-        isMarcus()
-    )
-    .build();
+    return Ability
+        .builder()
+        .name("hi")
+        .info("says hi")
+        .locality(ALL)
+        .privacy(PUBLIC)
+        .action(context -> {
+            final String firstName = context.user().getFirstName();
+            silent.send("Hi, " + firstName, context.chatId());
+        })
+        .reply(
+            (bot, update) -> silent.send("Wow, nice name!", update.getMessage().getChatId()),
+            TEXT,
+            update -> update.getMessage().getText().startsWith("/hi"),
+            isMarcus()
+        )
+        .build();
 }
 
 private Predicate<Update> isMarcus() {
-  return update -> update.getMessage().getFrom().getFirstName().equalsIgnoreCase("Marcus");
+    return update -> update.getMessage().getFrom().getFirstName().equalsIgnoreCase("Marcus");
 }
 ----
 
@@ -345,21 +343,21 @@ Let's use it to implement a simple counter:
 ----
 @SuppressWarnings({"unused", "WeakerAccess"})
 public Ability counter() {
-  return Ability.builder()
-      .name("count")
-      .info("increments a counter per user")
-      .privacy(PUBLIC)
-      .locality(ALL)
-      .action(context -> {
-        final Map<String, Integer> counterMap = db.getMap("COUNTERS");
-        final int userId = context.user().getId();
-        final Integer counter = counterMap.compute(
-            String.valueOf(userId), (id, count) -> count == null ? 1 : ++count);
-        final String message = String.format("%s, your count is now %d!",
-            context.user().getUserName(), counter);
-        silent.send(message, context.chatId());
-      })
-      .build();
+    return Ability.builder()
+        .name("count")
+        .info("increments a counter per user")
+        .privacy(PUBLIC)
+        .locality(ALL)
+        .action(context -> {
+            final Map<String, Integer> counterMap = db.getMap("COUNTERS");
+            final long userId = context.user().getId();
+            final Integer counter = counterMap.compute(
+                    String.valueOf(userId), (id, count) -> count == null ? 1 : ++count);
+            final String message = String.format("%s, your count is now %d!",
+                    context.user().getUserName(), counter);
+            silent.send(message, context.chatId());
+        })
+        .build();
 }
 ----
 
@@ -373,18 +371,18 @@ The ability bot automatically stores basic user information of every user, who c
 ----
 @SuppressWarnings({"unused", "WeakerAccess"})
 public Ability contacts() {
-  return Ability.builder()
-      .name("contacts")
-      .info("lists all users who contacted this bot")
-      .privacy(PUBLIC)
-      .locality(ALL)
-      .action(context -> {
-        final Map<String, User> usersMap = db.getMap("USERS");
-        final String users = usersMap.values().stream().map(User::getUserName).collect(joining(", "));
-        final String message = "The following users already contacted me: " + users;
-        silent.send(message, context.chatId());
-      })
-      .build();
+    return Ability.builder()
+        .name("contacts")
+        .info("lists all users who contacted this bot")
+        .privacy(PUBLIC)
+        .locality(ALL)
+        .action(context -> {
+            final Map<String, User> usersMap = db.getMap("USERS");
+            final String users = usersMap.values().stream().map(User::getUserName).collect(joining(", "));
+            final String message = "The following users already contacted me: " + users;
+            silent.send(message, context.chatId());
+        })
+        .build();
 }
 ----
 
@@ -400,40 +398,41 @@ From Telegram we do not get the photo directly. Instead, we get a list of `Photo
 ----
 @SuppressWarnings({"unused", "WeakerAccess"})
 public Reply savePhoto() {
-  return Reply.of(
-      update -> {
-        final List<PhotoSize> photos = update.getMessage().getPhoto();
-        final PhotoSize photoSize = photos.stream()
-            .max(Comparator.comparing(PhotoSize::getFileSize))
-            .orElse(null);
-        if (photoSize != null) {
-          // TODO download the photo
-          silent.send("Yeah, I got it!", getChatId(update));
-        } else {
-          silent.send("Houston, we have a problem!", getChatId(update));
-        }
-      },
-      Flag.PHOTO);
-  }
+    return Reply.of(
+        (bot, update) -> {
+            final List<PhotoSize> photos = update.getMessage().getPhoto();
+            final PhotoSize photoSize = photos.stream()
+                    .max(Comparator.comparing(PhotoSize::getFileSize))
+                    .orElse(null);
+            if (photoSize != null) {
+                // TODO download the photo
+                silent.send("Yeah, I got it!", getChatId(update));
+            } else {
+                silent.send("Houston, we have a problem!", getChatId(update));
+            }
+        },
+        Flag.PHOTO);
+}
 ----
 
-So far, so good. but there is still no photo, just a `PhotoSize` object. We have to actively download the photo in that size, we want, to reduce network traffic and server load. But to download a photo, we first need to get the file path of the photo. Sometimes photos already have a file path, sometimes not – then we have to ask Telegram for it. This is how we do that:
+So far, so good. but there is still no photo, just a `PhotoSize` object. We have to actively download the photo in that size, that we need, to reduce network traffic and server load. But to download a photo, we first need to get the file path of the photo. Sometimes photos already have a file path, sometimes not – then we have to ask Telegram for it. This is how we do that:
 
 [source,java]
 ----
 private String getFilePath(final PhotoSize photo) {
-  if (photo.hasFilePath()) {
-    return photo.getFilePath();
-  }
-  final GetFile getFileMethod = new GetFile();
-  getFileMethod.setFileId(photo.getFileId());
-  try {
-    final org.telegram.telegrambots.meta.api.objects.File file = execute(getFileMethod);
-    return file.getFilePath();
-  } catch (final TelegramApiException e) {
-    e.printStackTrace();
-  }
-  return null;
+    final var filePath = photo.getFilePath();
+    if (filePath != null && !filePath.isBlank()) {
+        return filePath;
+    }
+    final GetFile getFileMethod = new GetFile();
+    getFileMethod.setFileId(photo.getFileId());
+    try {
+        final org.telegram.telegrambots.meta.api.objects.File file = execute(getFileMethod);
+        return file.getFilePath();
+    } catch (final TelegramApiException e) {
+        e.printStackTrace();
+    }
+    return null;
 }
 ----
 
@@ -444,12 +443,12 @@ Using the file path we are now able to download the photo from Telegram. Luckily
 [source,java]
 ----
 private File downloadPhoto(final String filePath) {
-  try {
-    return downloadFile(filePath);
-  } catch (final TelegramApiException e) {
-    e.printStackTrace();
-  }
-  return null;
+    try {
+        return downloadFile(filePath);
+    } catch (final TelegramApiException e) {
+        e.printStackTrace();
+    }
+    return null;
 }
 ----
 
@@ -459,22 +458,22 @@ With these two helper methods we can now finish our `savePhoto` method:
 ----
 @SuppressWarnings({"unused", "WeakerAccess"})
 public Reply savePhoto() {
-  return Reply.of(
-      update -> {
-          final List<PhotoSize> photos = update.getMessage().getPhoto();
-          final PhotoSize photoSize = photos.stream()
-              .max(Comparator.comparing(PhotoSize::getFileSize))
-              .orElse(null);
-          if (photoSize != null) {
-            final String filePath = getFilePath(photoSize);
-            final File file = downloadPhoto(filePath);
-            System.out.println("Temporary file: " + file);
-            silent.send("Yeah, I got it!", getChatId(update));
-          } else {
-            silent.send("Houston, we have a problem!", getChatId(update));
-          }
-      },
-      Flag.PHOTO);
+    return Reply.of(
+        (bot, update) -> {
+            final List<PhotoSize> photos = update.getMessage().getPhoto();
+            final PhotoSize photoSize = photos.stream()
+                    .max(Comparator.comparing(PhotoSize::getFileSize))
+                    .orElse(null);
+            if (photoSize != null) {
+                final String filePath = getFilePath(photoSize);
+                final File file = downloadPhoto(filePath);
+                System.out.println("Temporary file: " + file);
+                silent.send("Yeah, I got it!", getChatId(update));
+            } else {
+                silent.send("Houston, we have a problem!", getChatId(update));
+            }
+        },
+        Flag.PHOTO);
 }
 ----
 
@@ -497,25 +496,25 @@ In this example we implement a `/logo` command which will, difficult to guess, s
 ----
 @SuppressWarnings({"unused", "WeakerAccess"})
 public Ability sendLogo() {
-  return Ability
-      .builder()
-      .name("logo")
-      .info("send the logo")
-      .locality(ALL)
-      .privacy(PUBLIC)
-      .action(context -> sendPhotoFromUrl("https://avatars3.githubusercontent.com/u/13538066?s=200&v=4", context.chatId()))
-      .build();
+    return Ability
+        .builder()
+        .name("logo")
+        .info("send the logo")
+        .locality(ALL)
+        .privacy(PUBLIC)
+        .action(context -> sendPhotoFromUrl("https://avatars3.githubusercontent.com/u/13538066?s=200&v=5", context.chatId()))
+        .build();
 }
 
 private void sendPhotoFromUrl(final String url, final Long chatId) {
-  final SendPhoto sendPhotoRequest = new SendPhoto(); // 1
-  sendPhotoRequest.setChatId(chatId);                 // 2
-  sendPhotoRequest.setPhoto(url);                     // 3
-  try {
-    execute(sendPhotoRequest);                        // 4
-  } catch (final TelegramApiException e) {
-    e.printStackTrace();
-  }
+    final SendPhoto sendPhotoRequest = new SendPhoto(); // 1
+    sendPhotoRequest.setChatId(String.valueOf(chatId)); // 2
+    sendPhotoRequest.setPhoto(new InputFile(url));      // 3
+    try {
+        execute(sendPhotoRequest);                      // 4
+    } catch (final TelegramApiException e) {
+        e.printStackTrace();
+    }
 }
 ----
 
@@ -528,14 +527,14 @@ To test this, we extend our previously written `savePhoto` method that it sends 
 [source,java]
 ----
 private void sendPhotoFromFileId(final String fileId, final Long chatId) {
-  final SendPhoto sendPhotoRequest = new SendPhoto(); // 1
-  sendPhotoRequest.setChatId(chatId);                 // 2
-  sendPhotoRequest.setPhoto(fileId);                  // 3
-  try {
-    execute(sendPhotoRequest);                        // 4
-  } catch (final TelegramApiException e) {
-    e.printStackTrace();
-  }
+    final SendPhoto sendPhotoRequest = new SendPhoto(); // 1
+    sendPhotoRequest.setChatId(String.valueOf(chatId)); // 2
+    sendPhotoRequest.setPhoto(new InputFile(fileId));   // 3
+    try {
+        execute(sendPhotoRequest);                      // 4
+    } catch (final TelegramApiException e) {
+        e.printStackTrace();
+    }
 }
 ----
 
@@ -545,23 +544,23 @@ Here you can see the modified `savePhoto` method, we just added one line:
 ----
 @SuppressWarnings({"unused", "WeakerAccess"})
 public Reply savePhoto() {
-  return Reply.of(
-      update -> {
-          final List<PhotoSize> photos = update.getMessage().getPhoto();
-          final PhotoSize photoSize = photos.stream()
-              .max(Comparator.comparing(PhotoSize::getFileSize))
-              .orElse(null);
-          if (photoSize != null) {
-            final String filePath = getFilePath(photoSize);
-            final File file = downloadPhoto(filePath);
-            System.out.println("Temporary file: " + file);
-            silent.send("Yeah, I got it!", getChatId(update));
-            sendPhotoFromFileId(photoSize.getFileId(), getChatId(update)); // here
-          } else {
-            silent.send("Houston, we have a problem!", getChatId(update));
-          }
-      },
-      Flag.PHOTO);
+    return Reply.of(
+        (bot, update) -> {
+            final List<PhotoSize> photos = update.getMessage().getPhoto();
+            final PhotoSize photoSize = photos.stream()
+                    .max(Comparator.comparing(PhotoSize::getFileSize))
+                    .orElse(null);
+            if (photoSize != null) {
+                final String filePath = getFilePath(photoSize);
+                final File file = downloadPhoto(filePath);
+                System.out.println("Temporary file: " + file);
+                silent.send("Yeah, I got it!", getChatId(update));
+                sendPhotoFromFileId(photoSize.getFileId(), getChatId(update));
+            } else {
+                silent.send("Houston, we have a problem!", getChatId(update));
+            }
+        },
+        Flag.PHOTO);
 }
 ----
 
@@ -573,25 +572,25 @@ This is so easy, you just need to specify a `File` object! The photo will be upl
 ----
 @SuppressWarnings({"unused", "WeakerAccess"})
 public Ability sendIcon() {
-  return Ability
-      .builder()
-      .name("icon")
-      .info("send the icon")
-      .locality(ALL)
-      .privacy(PUBLIC)
-      .action(context -> sendPhotoFromUpload("src/main/resources/chatbot.jpg", context.chatId()))
-      .build();
+    return Ability
+        .builder()
+        .name("icon")
+        .info("send the icon")
+        .locality(ALL)
+        .privacy(PUBLIC)
+        .action(context -> sendPhotoFromUpload("src/main/resources/chatbot.jpg", context.chatId()))
+        .build();
 }
 
 private void sendPhotoFromUpload(final String filePath, final Long chatId) {
-  final SendPhoto sendPhotoRequest = new SendPhoto(); // 1
-  sendPhotoRequest.setChatId(chatId);                 // 2
-  sendPhotoRequest.setPhoto(new File(filePath));      // 3
-  try {
-    execute(sendPhotoRequest);                        // 4
-  } catch (final TelegramApiException e) {
-    e.printStackTrace();
-  }
+    final SendPhoto sendPhotoRequest = new SendPhoto();           // 1
+    sendPhotoRequest.setChatId(String.valueOf(chatId));           // 2
+    sendPhotoRequest.setPhoto(new InputFile(new File(filePath))); // 3
+    try {
+        execute(sendPhotoRequest);                                // 4
+    } catch (final TelegramApiException e) {
+        e.printStackTrace();
+    }
 }
 ----
 
@@ -612,41 +611,41 @@ In our example we want to provide buttons for the actions of our bot so we use t
 ----
 @SuppressWarnings({"unused", "WeakerAccess"})
 public Ability sendKeyboard() {
-  return Ability
-      .builder()
-      .name("keyboard")
-      .info("send a custom keyboard")
-      .locality(ALL)
-      .privacy(PUBLIC)
-      .action(context -> {
-        final SendMessage message = new SendMessage();
-        message.setChatId(context.chatId());
-        message.setText("Enjoy this wonderful keyboard!");
+    return Ability
+        .builder()
+        .name("keyboard")
+        .info("send a custom keyboard")
+        .locality(ALL)
+        .privacy(PUBLIC)
+        .action(context -> {
+            final SendMessage message = new SendMessage();
+            message.setChatId(String.valueOf(context.chatId()));
+            message.setText("Enjoy this wonderful keyboard!");
 
-        final ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-        final List<KeyboardRow> keyboard = new ArrayList<>();
+            final ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+            final List<KeyboardRow> keyboard = new ArrayList<>();
 
-        // row 1
-        KeyboardRow row = new KeyboardRow();
-        row.add("/hello");
-        row.add("/hi");
-        row.add("/count");
-        keyboard.add(row);
+            // row 1
+            KeyboardRow row = new KeyboardRow();
+            row.add("/hello");
+            row.add("/hi");
+            row.add("/count");
+            keyboard.add(row);
 
-        // row 2
-        row = new KeyboardRow();
-        row.add("/contacts");
-        row.add("/logo");
-        row.add("/icon");
-        keyboard.add(row);
+            // row 2
+            row = new KeyboardRow();
+            row.add("/contacts");
+            row.add("/logo");
+            row.add("/icon");
+            keyboard.add(row);
 
-        // activate the keyboard
-        keyboardMarkup.setKeyboard(keyboard);
-        message.setReplyMarkup(keyboardMarkup);
+            // activate the keyboard
+            keyboardMarkup.setKeyboard(keyboard);
+            message.setReplyMarkup(keyboardMarkup);
 
-        silent.execute(message);
-      })
-      .build();
+            silent.execute(message);
+        })
+        .build();
 }
 ----
 
@@ -658,18 +657,18 @@ To send formatted messages, you can use Markdown syntax. As of today, Telegram s
 ----
 @SuppressWarnings({"unused", "WeakerAccess"})
 public Ability format() {
-  return Ability
-      .builder()
-      .name("format")
-      .info("formats the message")
-      .locality(ALL)
-      .privacy(PUBLIC)
-      .action(context -> {
-        silent.sendMd("You can make text *bold* or _italic_.", context.chatId());
-        silent.sendMd("`This is code.`", context.chatId());
-        silent.sendMd("```\nThis\nis\nmulti\nline\ncode.\n```", context.chatId());
-      })
-      .build();
+    return Ability
+        .builder()
+        .name("format")
+        .info("formats the message")
+        .locality(ALL)
+        .privacy(PUBLIC)
+        .action(context -> {
+            silent.sendMd("You can make text *bold* or _italic_.", context.chatId());
+            silent.sendMd("`This is code.`", context.chatId());
+            silent.sendMd("```\nThis\nis\nmulti\nline\ncode.\n```", context.chatId());
+        })
+        .build();
 }
 ----
 
@@ -681,20 +680,20 @@ Commands can have arguments. Usually arguments are separated by whitespace. You 
 ----
 @SuppressWarnings({"unused", "WeakerAccess"})
 public Ability add() {
-  return Ability
-      .builder()
-      .name("add")
-      .info("adds to numbers")
-      .locality(ALL)
-      .privacy(PUBLIC)
-      .input(2)
-      .action(context -> {
-        final int a = Integer.parseInt(context.firstArg());
-        final int b = Integer.parseInt(context.secondArg());
-        final int sum = a + b;
-        silent.send(String.format("The sum of %d and %d is %d", a, b, sum), context.chatId());
-      })
-      .build();
+    return Ability
+        .builder()
+        .name("add")
+        .info("adds to numbers")
+        .locality(ALL)
+        .privacy(PUBLIC)
+        .input(2)
+        .action(context -> {
+            final int a = Integer.parseInt(context.firstArg());
+            final int b = Integer.parseInt(context.secondArg());
+            final int sum = a + b;
+            silent.send(String.format("The sum of %d and %d is %d", a, b, sum), context.chatId());
+        })
+        .build();
 }
 ----
 
@@ -708,12 +707,12 @@ You can answer to non-command messages, too. That's what default abilities are f
 ----
 @SuppressWarnings({"unused", "WeakerAccess"})
 public Ability sayNo() {
-  return Ability.builder()
-      .name(DEFAULT)
-      .privacy(PUBLIC)
-      .locality(ALL)
-      .action(context -> silent.send("Sorry, I have no answer for you today.", context.chatId()))
-      .build();
+    return Ability.builder()
+        .name(DEFAULT)
+        .privacy(PUBLIC)
+        .locality(ALL)
+        .action(context -> silent.send("Sorry, I have no answer for you today.", context.chatId()))
+        .build();
 }
 ----
 
@@ -725,8 +724,8 @@ Better late than never – let's talk about testing. For testing our bot we need
 
 [source,groovy]
 ----
-testCompile group: 'junit', name: 'junit', version: '4.12'
-testCompile group: 'org.mockito', name: 'mockito-core', version: '2.28.2'
+testCompile group: 'junit', name: 'junit', version: '4.13.2'
+testCompile group: 'org.mockito', name: 'mockito-core', version: '4.5.1'
 ----
 
 === Prepare your Bot
@@ -737,7 +736,7 @@ In some of our abilities we use a database connection. We need to add an additio
 ----
 @VisibleForTesting
 WorkshopBot(final DBContext db) {
-  super(BOT_TOKEN, BOT_USERNAME, db);
+    super(BOT_TOKEN, BOT_USERNAME, db);
 }
 ----
 
@@ -747,12 +746,12 @@ To prevent that the live system of Telegram is used, we need to inject mocks for
 ----
 @VisibleForTesting
 void setSender(final MessageSender sender) {
-  this.sender = sender;
+    this.sender = sender;
 }
 
 @VisibleForTesting
 void setSilent(final SilentSender silent) {
-  this.silent = silent;
+    this.silent = silent;
 }
 ----
 
@@ -768,23 +767,23 @@ void setSilent(final SilentSender silent) {
 ----
 public class WorkshopBotTest {
 
-  private WorkshopBot bot;
-  private DBContext db;
-  private MessageSender sender;
+    private WorkshopBot bot;
+    private DBContext db;
+    private MessageSender sender;
 
-  @Before
-  public void setUp() {
-    db = MapDBContext.offlineInstance("test"); // 1
-    bot = new WorkshopBot(db);                 // 2
-    sender = mock(MessageSender.class);        // 3
-    bot.setSender(sender);                     // 4
-    bot.setSilent(new SilentSender(sender));   // 5
-  }
+    @Before
+    public void setUp() {
+        db = MapDBContext.offlineInstance("test"); // 1
+        bot = new WorkshopBot(db);                 // 2
+        sender = mock(MessageSender.class);        // 3
+        bot.setSender(sender);                     // 4
+        bot.setSilent(new SilentSender(sender));   // 5
+    }
 
-  @After
-  public void tearDown() {
-    db.clear();
-  }
+    @After
+    public void tearDown() {
+        db.clear();
+    }
 
 }
 ----
@@ -800,24 +799,24 @@ private static final long CHAT_ID = 12345L;
 
 @Test
 public void sayHelloWorld() throws TelegramApiException {
-  final Update mockedUpdate = mock(Update.class);
-  final User user = new User(USER_ID, "Foo", false, "Bar", "foobar42", "en");
-  final MessageContext context = MessageContext.newContext(mockedUpdate, user, CHAT_ID);
+    final var mockedUpdate = mock(Update.class);
+    final var user = new User(USER_ID, "Foo", false, "Bar", "foobar42", "en", false, false, false);
+    final var context = MessageContext.newContext(mockedUpdate, user, CHAT_ID, bot);
 
-  bot.sayHelloWorld().action().accept(context);
+    bot.sayHelloWorld().action().accept(context);
 
-  final SendMessage message = new SendMessage();
-  message.setChatId(CHAT_ID);
-  message.setText("Hello world!");
-  verify(sender, times(1)).execute(message);
+    final var message = new SendMessage();
+    message.setChatId(String.valueOf(CHAT_ID));
+    message.setText("Hello world");
+    verify(sender, times(1)).execute(message);
 }
 ----
 
-In the first code block we mock the `Update` class, which is used by the context object. Then we create an `EndUser` for our test case and create a new context object with all needed information.
+In the first code block we mock the `Update` class, which is used by the context object. Then we create a `User` for our test case and create a new context object with all needed information.
 
 The one line in the middle block executes our bot ability.
 
-The last block does the assertions. In this example we check, that the message was send exactly once to the correct chat. Therefore we need a message object with the text and chat id for the `verify` method of Mockito.
+The last block does the assertions. In this example we check, that the message was sent exactly once to the correct chat. Therefore, we need a message object with the text and chat id for the `verify` method of Mockito.
 
 == Additional Exercises
 
