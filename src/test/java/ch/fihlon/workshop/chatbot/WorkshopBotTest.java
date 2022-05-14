@@ -18,9 +18,9 @@
 
 package ch.fihlon.workshop.chatbot;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.telegram.abilitybots.api.db.DBContext;
 import org.telegram.abilitybots.api.db.MapDBContext;
 import org.telegram.abilitybots.api.objects.MessageContext;
@@ -44,7 +44,7 @@ public class WorkshopBotTest {
     private DBContext db;
     private MessageSender sender;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         // Offline instance will get deleted at JVM shutdown
         db = MapDBContext.offlineInstance("test");
@@ -68,7 +68,7 @@ public class WorkshopBotTest {
         verify(sender, times(1)).execute(message);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         db.clear();
     }

@@ -728,8 +728,8 @@ Better late than never – let's talk about testing. For testing our bot we need
 
 [source,groovy]
 ----
-testCompile group: 'junit', name: 'junit', version: '4.13.2'
-testCompile group: 'org.mockito', name: 'mockito-core', version: '4.5.1'
+testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.8.2'
+testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.5.1'
 ----
 
 === Prepare your Bot
