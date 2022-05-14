@@ -37,11 +37,13 @@ On Windows, you may have to replace `/` by `\`.
 
 === Dependencies
 
-To use the Telegram Bot API, please add the following dependency:
+To use the Telegram Bot API, please add the following dependencies:
 
 [source,groovy]
 ----
-compile group: 'org.telegram', name: 'telegrambots', version: '6.0.1'
+implementation group: 'org.telegram', name: 'telegrambots', version: '6.0.1'
+implementation 'org.slf4j:slf4j-api:1.7.36'
+implementation 'org.slf4j:slf4j-simple:1.7.36'
 ----
 
 === Create a bot class
@@ -153,11 +155,13 @@ _Congratulations!_
 
 === Dependencies
 
-To use the Telegram Bot Ability API, please add the following dependency:
+To use the Telegram Bot Ability API, please add the following dependencies:
 
 [source,groovy]
 ----
-compile group: 'org.telegram', name: 'telegrambots-abilities', version: '6.0.1'
+implementation group: 'org.telegram', name: 'telegrambots-abilities', version: '6.0.1'
+implementation 'org.slf4j:slf4j-api:1.7.36'
+implementation 'org.slf4j:slf4j-simple:1.7.36'
 ----
 
 === Create a bot class
