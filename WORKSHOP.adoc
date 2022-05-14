@@ -42,8 +42,8 @@ To use the Telegram Bot API, please add the following dependencies:
 [source,groovy]
 ----
 implementation group: 'org.telegram', name: 'telegrambots', version: '6.0.1'
-implementation 'org.slf4j:slf4j-api:1.7.36'
-implementation 'org.slf4j:slf4j-simple:1.7.36'
+implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.36'
+implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.36'
 ----
 
 === Create a bot class
@@ -160,8 +160,8 @@ To use the Telegram Bot Ability API, please add the following dependencies:
 [source,groovy]
 ----
 implementation group: 'org.telegram', name: 'telegrambots-abilities', version: '6.0.1'
-implementation 'org.slf4j:slf4j-api:1.7.36'
-implementation 'org.slf4j:slf4j-simple:1.7.36'
+implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.36'
+implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.36'
 ----
 
 === Create a bot class
