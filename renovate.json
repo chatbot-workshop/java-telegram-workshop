@@ -1,7 +1,13 @@
 {
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:base",
     ":disableDependencyDashboard"
+  ],
+  "ignorePaths": [
+    "Dockerfile",
+    "package.json",
+    "pnpm-lock.yaml"
   ],
   "assignees": [
     "McPringle"
@@ -13,11 +19,13 @@
     {
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "automerge": true,
+      "automergeType": "branch",
       "commitMessagePrefix" : "⬆️ "
     },
     {
       "matchDepTypes": ["devDependencies"],
       "automerge": true,
+      "automergeType": "branch",
       "commitMessagePrefix" : "⬆️ "
     }
   ],
